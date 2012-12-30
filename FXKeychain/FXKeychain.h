@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.0
+//  Version 1.1
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -35,10 +35,6 @@
 #import <Security/Security.h>
 
 
-extern NSString *const FXKeychainDefaultAccount;
-extern NSString *const FXKeychainDefaultService;
-
-
 @interface FXKeychain : NSObject
 
 + (instancetype)defaultKeychain;
@@ -52,7 +48,9 @@ extern NSString *const FXKeychainDefaultService;
           accessGroup:(NSString *)accessGroup;
 
 - (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key;
+- (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key;
 - (BOOL)removeObjectForKey:(id<NSCopying>)key;
 - (id)objectForKey:(id<NSCopying>)key;
+- (id)objectForKeyedSubscript:(id<NSCopying>)key;
 
 @end

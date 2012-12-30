@@ -68,7 +68,7 @@
     [self updateKeychainFromFields];
     
     //save data
-    [_keychain setObject:_dataField.text forKey:_keyField.text];
+    _keychain[_keyField.text] = _dataField.text;
 }
 
 - (IBAction)load
@@ -77,13 +77,13 @@
     [self updateKeychainFromFields];
     
     //load data
-    _dataField.text = [_keychain objectForKey:_keyField.text];
+    _dataField.text = _keychain[_keyField.text];
 }
 
 - (IBAction)delete
 {
     //clear data
-    _dataField.text = nil;
+    _dataField.text = @"";
     
     //update keychain
     [self updateKeychainFromFields];

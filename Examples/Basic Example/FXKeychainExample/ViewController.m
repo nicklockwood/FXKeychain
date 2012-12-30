@@ -23,17 +23,20 @@
 - (IBAction)save
 {
     //save data
-    [[FXKeychain defaultKeychain] setObject:_dataField.text forKey:_keyField.text];
+    [FXKeychain defaultKeychain][_keyField.text] = _dataField.text;
 }
 
 - (IBAction)load
 {
     //load data
-    _dataField.text = [[FXKeychain defaultKeychain] objectForKey:_keyField.text];
+    _dataField.text = [FXKeychain defaultKeychain][_keyField.text];
 }
 
 - (IBAction)delete
 {
+    //clear field
+    _dataField.text = @"";
+    
     //delete data
     [[FXKeychain defaultKeychain] removeObjectForKey:_keyField.text];
 }

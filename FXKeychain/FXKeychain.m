@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.0
+//  Version 1.1
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -40,10 +40,6 @@
 #endif
 
 
-NSString *const FXKeychainDefaultAccount = @"default";
-NSString *const FXKeychainDefaultService = @"default";
-
-
 @implementation FXKeychain
 
 + (instancetype)defaultKeychain
@@ -51,8 +47,9 @@ NSString *const FXKeychainDefaultService = @"default";
     id sharedInstance = nil;
     if (!sharedInstance)
     {
-        sharedInstance = [[FXKeychain alloc] initWithAccount:FXKeychainDefaultAccount
-                                                     service:FXKeychainDefaultService
+        NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
+        sharedInstance = [[FXKeychain alloc] initWithAccount:@"default"
+                                                     service:bundleID
                                                  accessGroup:nil];
     }
     return sharedInstance;
@@ -85,7 +82,7 @@ NSString *const FXKeychainDefaultService = @"default";
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecAttrGeneric] = key;
     
-#if !TARGET_IPHONE_SIMULATOR
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
 #endif
     
@@ -115,16 +112,21 @@ NSString *const FXKeychainDefaultService = @"default";
         status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
         if (status != errSecSuccess)
         {
-            NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, status);
+            NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
             return NO;
         }
     }
     else if (status != errSecSuccess)
     {
-        NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, status);
+        NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
         return NO;
     }
     return YES;
+}
+
+- (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key
+{
+    return [self setObject:object forKey:key];
 }
 
 - (BOOL)removeObjectForKey:(id<NSCopying>)key
@@ -143,7 +145,7 @@ NSString *const FXKeychainDefaultService = @"default";
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
     query[(__bridge NSString *)kSecAttrGeneric] = key;
     
-#if !TARGET_IPHONE_SIMULATOR
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
 #endif
     
@@ -181,6 +183,11 @@ NSString *const FXKeychainDefaultService = @"default";
         //no value found
         return nil;
     }
+}
+
+- (id)objectForKeyedSubscript:(id<NSCopying>)key
+{
+    return [self objectForKey:key];
 }
 
 @end
