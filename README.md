@@ -53,7 +53,7 @@ Methods
 
     + (instancetype)defaultKeychain;
     
-This method returns a shared default keychain instance, which has the value FXKeychainDefaultAccount for the account and FXKeychainDefaultService for the service.
+This method returns a shared default keychain instance, which has the value @"default" for the account and uses the app's bundle ID for the service to avoid namespace collisions with other apps on Mac OS or the iOS simulator.
     
     - (id)initWithAccount:(NSString *)account
                   service:(NSString *)service
