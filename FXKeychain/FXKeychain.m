@@ -183,4 +183,14 @@ NSString *const FXKeychainDefaultService = @"default";
     }
 }
 
+- (void)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key
+{
+	[self setObject:object forKey:key];
+}
+
+- (id)objectForKeyedSubscript:(id<NSCopying>)key
+{
+	return [self objectForKey:key];
+}
+
 @end

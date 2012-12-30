@@ -55,4 +55,7 @@ extern NSString *const FXKeychainDefaultService;
 - (BOOL)removeObjectForKey:(id<NSCopying>)key;
 - (id)objectForKey:(id<NSCopying>)key;
 
+- (void)setObject:(id<NSCoding>)object forKeyedSubscript:(id <NSCopying>)key;
+- (id)objectForKeyedSubscript:(id<NSCopying>)key;
+
 @end
