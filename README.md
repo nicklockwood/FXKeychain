@@ -41,7 +41,7 @@ The account property is used to distinguish between multiple user accounts withi
     
     @property (nonatomic, copy, readonly) NSString *service;
     
-The service property is used to distinguish between multiple services within the same app. The service value might be something like "Account Details" for example.
+The service property is used to distinguish between multiple apps or services on a given device or within the same app. On Mac OS and the iOS simulator, services are shared between apps, so it's a good idea to use something unique for the service, such as the application bundle ID, or the same value as the accessGroup if you wish to share a service between multiple apps.
     
     @property (nonatomic, copy, readonly) NSString *accessGroup;
 
