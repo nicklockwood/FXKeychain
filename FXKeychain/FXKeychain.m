@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.1
+//  Version 1.2
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -48,8 +48,7 @@
     if (!sharedInstance)
     {
         NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
-        sharedInstance = [[FXKeychain alloc] initWithAccount:@"default"
-                                                     service:bundleID
+        sharedInstance = [[FXKeychain alloc] initWithService:bundleID
                                                  accessGroup:nil];
     }
     return sharedInstance;
@@ -57,16 +56,14 @@
 
 - (id)init
 {
-    return [self initWithAccount:nil service:nil accessGroup:nil];
+    return [self initWithService:nil accessGroup:nil];
 }
 
-- (id)initWithAccount:(NSString *)account
-              service:(NSString *)service
+- (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup
 {
     if ((self = [super init]))
     {
-        _account = [account copy];
         _service = [service copy];
         _accessGroup = [accessGroup copy];
     }
@@ -77,10 +74,9 @@
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_account length]) query[(__bridge NSString *)kSecAttrAccount] = _account;
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
-    query[(__bridge NSString *)kSecAttrGeneric] = key;
+    query[(__bridge NSString *)kSecAttrAccount] = key;
     
 #if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
@@ -92,7 +88,7 @@
     {
         data = [(NSString *)object dataUsingEncoding:NSUTF8StringEncoding];
     }
-    else
+    else if (object)
     {
         data = [NSKeyedArchiver archivedDataWithRootObject:object];
     }
@@ -138,12 +134,11 @@
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_account length]) query[(__bridge NSString *)kSecAttrAccount] = _account;
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    query[(__bridge NSString *)kSecAttrGeneric] = key;
+    query[(__bridge NSString *)kSecAttrAccount] = key;
     
 #if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;

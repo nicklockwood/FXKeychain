@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.1
+//  Version 1.2
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -39,12 +39,10 @@
 
 + (instancetype)defaultKeychain;
 
-@property (nonatomic, copy, readonly) NSString *account;
 @property (nonatomic, copy, readonly) NSString *service;
 @property (nonatomic, copy, readonly) NSString *accessGroup;
 
-- (id)initWithAccount:(NSString *)account
-              service:(NSString *)service
+- (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup;
 
 - (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key;

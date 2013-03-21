@@ -3,7 +3,7 @@ Purpose
 
 FXKeychain is a lightweight wrapper around the Apple keychain APIs that exposes the commonly used functionality whilst hiding the horrific complexity and ugly interface of the underlying APIs.
 
-FXKeychain treats the keychain like a simple dictionary that you can set and get values from. For most purposes you can get by using the defaultKeychain, however it is also possible to create new keychain instances if you wish to namespace your keychain by account/service, or share values between apps using an accessGroup.
+FXKeychain treats the keychain like a simple dictionary that you can set and get values from. For most purposes you can get by using the defaultKeychain, however it is also possible to create new keychain instances if you wish to namespace your keychain by service, or share values between apps using an accessGroup.
 
 
 Supported iOS & SDK Versions
@@ -34,11 +34,7 @@ Properties
 ------------------
     
 FXKeychain has the following properties. They are all immutable once the keychain has been created.
-    
-    @property (nonatomic, copy, readonly) NSString *account;
-    
-The account property is used to distinguish between multiple user accounts within the same app. If the app supports multiple users, you might use their username or another user-specific identifer for the account value.
-    
+        
     @property (nonatomic, copy, readonly) NSString *service;
     
 The service property is used to distinguish between multiple apps or services on a given device or within the same app. On Mac OS and the iOS simulator, services are shared between apps, so it's a good idea to use something unique for the service, such as the application bundle ID, or the same value as the accessGroup if you wish to share a service between multiple apps.
@@ -53,13 +49,12 @@ Methods
 
     + (instancetype)defaultKeychain;
     
-This method returns a shared default keychain instance, which has the value @"default" for the account and uses the app's bundle ID for the service to avoid namespace collisions with other apps on Mac OS or the iOS simulator.
+This method returns a shared default keychain instance, which uses the app's bundle ID for the service to avoid namespace collisions with other apps on Mac OS or the iOS simulator.
     
-    - (id)initWithAccount:(NSString *)account
-                  service:(NSString *)service
+    - (id)initWithService:(NSString *)service
               accessGroup:(NSString *)accessGroup;
               
-This method creates a new FXKeychain instance with the specified parameters. Each FXKeychain can contain as many key/value pairs as you want, so you may only need a single FXKeychain per application. Each FXKeychain is uniquely identified by the account and service parameters; see the Properties description for how to use these. You can specify nil for the account and/or service values, in which case they will act as "wildcard" selectors and calls to objectForKey: will return the first value found within any account/service pair. The accessGroup parameter is used for setting up shared keychains that can be accessed by multiple different apps; leave this as nil if you do not require that functionality.
+This method creates a new FXKeychain instance with the specified parameters. Each FXKeychain can contain as many key/value pairs as you want, so you may only need a single FXKeychain per application. Each FXKeychain is uniquely identified by the service parameter; see the Properties description for how to use this. You can specify nil for the service, in which case it will act as "wildcard" selector and calls to objectForKey: will return the first value found within any service stored in the keychain. The accessGroup parameter is used for setting up shared keychains that can be accessed by multiple different apps; leave this as nil if you do not require that functionality.
     
     - (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key;
     - (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key;

@@ -1,3 +1,8 @@
+Version 1.2
+
+- It is now possible to actually store more than one value per FXKeychain
+- Removed account parameter (it didn't work the way I thought)
+
 Version 1.1
 
 - Now uses application bundle ID to namespace the default keychain

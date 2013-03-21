@@ -14,7 +14,6 @@
 
 @property (nonatomic, strong) FXKeychain *keychain;
 
-@property (nonatomic, weak) IBOutlet UITextField *accountField;
 @property (nonatomic, weak) IBOutlet UITextField *serviceField;
 @property (nonatomic, weak) IBOutlet UITextField *accessGroupField;
 
@@ -32,8 +31,7 @@
 	
     //get settings from NSUserDefaults
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    _accountField.text = [defaults objectForKey:@"account"] ?: @"default";
-    _serviceField.text = [defaults objectForKey:@"service"] ?: @"default";
+    _serviceField.text = [defaults objectForKey:@"service"] ?: [[NSBundle mainBundle] bundleIdentifier];
     _accessGroupField.text = [defaults objectForKey:@"accessGroup"];
     _keyField.text = [defaults objectForKey:@"key"] ?: @"password";
     
@@ -45,17 +43,16 @@
 {
     //preserve settings in NSUserDefaults
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:_accountField.text forKey:@"account"];
     [defaults setObject:_serviceField.text forKey:@"service"];
     [defaults setObject:_accessGroupField.text forKey:@"accessGroup"];
     [defaults setObject:_keyField.text forKey:@"key"];
+    [defaults synchronize];
 }
 
 - (void)updateKeychainFromFields
 {
     //create keychain
-    _keychain = [[FXKeychain alloc] initWithAccount:_accountField.text
-                                            service:_serviceField.text
+    _keychain = [[FXKeychain alloc] initWithService:_serviceField.text
                                         accessGroup:_accessGroupField.text];
 }
 
@@ -94,7 +91,6 @@
 
 - (IBAction)tap
 {
-    [_accountField resignFirstResponder];
     [_serviceField resignFirstResponder];
     [_accessGroupField resignFirstResponder];
     [_keyField resignFirstResponder];
