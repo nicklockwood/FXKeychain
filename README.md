@@ -30,6 +30,16 @@ Installation
 To use FXKeychain, just drag the class files into your project and add the Security framework. You can use the [FXKeychain defaultKeychain] shared instance, or create new instance as and when you need them.
 
 
+Security
+------------
+
+Caution is advised when storing and retrieving non-string objects from the keychain. On iOS, the keychain is sandboxed to a single app or to a group of apps shared by a single developer. But on Mac OS, any app can read or write to any entry in the keychain. This offers the potential for a malicious app to attempt to manipulate the behaviour of another by changing its keychain data.
+
+Version 1.2 and earlier of FXKeychain allowed arbitrary classes to be stored in the keychain using NSCoding. This feature has been removed in 1.3 to mitigate the risk that an app might change the encoded classes in your app's keychain in order to get it to load and run code that it isn't supposed to.
+
+Using version 1.3 should protect you from this, as only plist-compatible classes are now supported, which cannot easily be used in a malicious way. It is still recommended however that you verify that the data being loaded from the keychain  matches the type and structure that you are expecting in order to protect against malicious or mischevious tinkering with the data that might crash your app or cause it to behave strangely.
+
+
 Properties
 ------------------
     
@@ -56,16 +66,16 @@ This method returns a shared default keychain instance, which uses the app's bun
               
 This method creates a new FXKeychain instance with the specified parameters. Each FXKeychain can contain as many key/value pairs as you want, so you may only need a single FXKeychain per application. Each FXKeychain is uniquely identified by the service parameter; see the Properties description for how to use this. You can specify nil for the service, in which case it will act as "wildcard" selector and calls to objectForKey: will return the first value found within any service stored in the keychain. The accessGroup parameter is used for setting up shared keychains that can be accessed by multiple different apps; leave this as nil if you do not require that functionality.
     
-    - (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key;
-    - (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key;
+    - (BOOL)setObject:(id)object forKey:(id)key;
+    - (BOOL)setObject:(id)object forKeyedSubscript:(id)key;
     
-These methods will save the specified object in the keychain. The object can be of any class that implements the NSCoding protocol. Values of type NSString will be stored as UTF8-encoded data, and are intercompatible with other keychain solutions. Any other object type will be stored as NSCoded data. Passing a value of nil as the object will remove the key from the keychain. The second form of this method is functionally identical to the first, but is included to support the modern objective C keyed subscripting syntax.
+These methods will save the specified object in the keychain. Any plist-compatible object (NSDictionary, NSArray, NSNumber, etc.) can be stored. Objects of type NSString will be stored as UTF8-encoded data, and are intercompatible with other keychain solutions. Any other object type will be stored using binary plist encoding. Passing a value of nil as the object will remove the key from the keychain. The second form of this method is functionally identical to the first, but is included to support the modern objective C keyed subscripting syntax.
     
-    - (BOOL)removeObjectForKey:(id<NSCopying>)key;
+    - (BOOL)removeObjectForKey:(id)key;
     
 This method deletes the specified key from the keychain.
     
-    - (id)objectForKey:(id<NSCopying>)key;
-    - (id)objectForKeyedSubscript:(id<NSCopying>)key;
+    - (id)objectForKey:(id)key;
+    - (id)objectForKeyedSubscript:(id)key;
 
 This method returns the value for the specified key from the keychain. If the key does not exist it will return nil. The second form of this method is functionally identical to the first, but is included to support the modern objective C keyed subscripting syntax.

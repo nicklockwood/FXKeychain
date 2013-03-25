@@ -1,3 +1,7 @@
+Version 1.3
+
+- Removed ability to store arbitrary classes in keychain for security reasons (see README). It is still possible to store dictionaries, arrays, etc.
+
 Version 1.2
 
 - It is now possible to actually store more than one value per FXKeychain

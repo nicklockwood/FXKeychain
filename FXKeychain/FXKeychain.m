@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.2
+//  Version 1.3
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -70,13 +70,13 @@
     return self;
 }
 
-- (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key
+- (BOOL)setObject:(id)object forKey:(id)key
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
-    query[(__bridge NSString *)kSecAttrAccount] = key;
+    query[(__bridge NSString *)kSecAttrAccount] = [key description];
     
 #if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
@@ -84,17 +84,21 @@
     
     //encode object
     NSData *data = nil;
+    NSError *error = nil;
     if ([(id)object isKindOfClass:[NSString class]])
     {
         data = [(NSString *)object dataUsingEncoding:NSUTF8StringEncoding];
     }
     else if (object)
     {
-        data = [NSKeyedArchiver archivedDataWithRootObject:object];
+        data = [NSPropertyListSerialization dataWithPropertyList:object
+                                                          format:NSPropertyListBinaryFormat_v1_0
+                                                         options:0
+                                                           error:&error];
     }
     if (object && !data)
     {
-        NSLog(@"FXKeychain failed to encode object for key '%@'", key);
+        NSLog(@"FXKeychain failed to encode object for key '%@', error: %@", key, error);
         return NO;
     }
     
@@ -120,17 +124,17 @@
     return YES;
 }
 
-- (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key
+- (BOOL)setObject:(id)object forKeyedSubscript:(id)key
 {
     return [self setObject:object forKey:key];
 }
 
-- (BOOL)removeObjectForKey:(id<NSCopying>)key
+- (BOOL)removeObjectForKey:(id)key
 {
     return [self setObject:nil forKey:key];
 }
 
-- (id)objectForKey:(id<NSCopying>)key
+- (id)objectForKey:(id)key
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -138,7 +142,7 @@
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    query[(__bridge NSString *)kSecAttrAccount] = key;
+    query[(__bridge NSString *)kSecAttrAccount] = [key description];
     
 #if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
@@ -146,20 +150,21 @@
     
     //recover data
     id object = nil;
+    NSError *error = nil;
     CFDataRef data = nil;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
     if (status == errSecSuccess && data)
     {
-        //check if file is a plist
-        NSDictionary *dict = [NSPropertyListSerialization propertyListWithData:(__bridge NSData *)data
-                                                                       options:NSPropertyListImmutable
-                                                                        format:NULL
-                                                                         error:NULL];
+        //attempt to decode as a plist
+        object = [NSPropertyListSerialization propertyListWithData:(__bridge NSData *)data
+                                                           options:NSPropertyListImmutable
+                                                            format:NULL
+                                                             error:&error];
         
-        if ([dict respondsToSelector:@selector(objectForKey:)] && dict[@"$archiver"])
+        if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
         {
-            //data represents a dictionary. attempt to decode as NSCoded archive
-            object = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)data];
+            //data represents an NSCoded archive. don't trust it
+            object = nil;
         }
         else if (!object)
         {
@@ -168,7 +173,7 @@
         }
         if (!object)
         {
-             NSLog(@"FXKeychain failed to decode data for key '%@'", key);
+             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
         }
         CFRelease(data);
         return object;
@@ -180,7 +185,7 @@
     }
 }
 
-- (id)objectForKeyedSubscript:(id<NSCopying>)key
+- (id)objectForKeyedSubscript:(id)key
 {
     return [self objectForKey:key];
 }

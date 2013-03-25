@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.2
+//  Version 1.3
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -45,10 +45,10 @@
 - (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup;
 
-- (BOOL)setObject:(id<NSCoding>)object forKey:(id<NSCopying>)key;
-- (BOOL)setObject:(id<NSCoding>)object forKeyedSubscript:(id<NSCopying>)key;
-- (BOOL)removeObjectForKey:(id<NSCopying>)key;
-- (id)objectForKey:(id<NSCopying>)key;
-- (id)objectForKeyedSubscript:(id<NSCopying>)key;
+- (BOOL)setObject:(id)object forKey:(id)key;
+- (BOOL)setObject:(id)object forKeyedSubscript:(id)key;
+- (BOOL)removeObjectForKey:(id)key;
+- (id)objectForKey:(id)key;
+- (id)objectForKeyedSubscript:(id)key;
 
 @end
