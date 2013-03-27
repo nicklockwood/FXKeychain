@@ -44,13 +44,15 @@
 
 + (instancetype)defaultKeychain
 {
-    id sharedInstance = nil;
-    if (!sharedInstance)
-    {
+    static id sharedInstance = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
         sharedInstance = [[FXKeychain alloc] initWithService:bundleID
                                                  accessGroup:nil];
-    }
+    });
+
     return sharedInstance;
 }
 
