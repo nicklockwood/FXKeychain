@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3
+//  Version 1.3.1
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -45,9 +45,9 @@
 + (instancetype)defaultKeychain
 {
     static id sharedInstance = nil;
-
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        
         NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
         sharedInstance = [[FXKeychain alloc] initWithService:bundleID
                                                  accessGroup:nil];
