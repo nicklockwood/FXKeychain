@@ -72,30 +72,9 @@
     return self;
 }
 
-- (BOOL)objectIsOfSupportedType:(id)object
-{
-    static NSSet *supportedTypes = nil;
-
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        supportedTypes = [NSSet setWithArray:@[[NSDictionary class], [NSArray class], [NSString class], [NSNumber class], [NSDate class], [NSNull class]]];
-    });
-
-    for (Class class in supportedTypes)
-    {
-        if ([object isKindOfClass:class])
-        {
-            return YES;
-        }
-    }
-
-    return NO;
-}
-
-
 - (BOOL)setObject:(id)object forKey:(id)key
 {
-    NSAssert([self objectIsOfSupportedType:object], @"%@ can't store object of type.", NSStringFromClass([self class]), [object class]);
+    NSParameterAssert(key);
 
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -121,12 +100,9 @@
                                                          options:0
                                                            error:&error];
     }
-    if (object && !data)
-    {
-        NSLog(@"FXKeychain failed to encode object for key '%@', error: %@", key, error);
-        return NO;
-    }
-    
+
+    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
+
     //delete existing data
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
     
@@ -161,6 +137,8 @@
 
 - (id)objectForKey:(id)key
 {
+    NSParameterAssert(key);
+
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
