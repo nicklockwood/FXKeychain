@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.1
+//  Version 1.3.2
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -72,8 +72,31 @@
     return self;
 }
 
+- (BOOL)objectIsOfSupportedType:(id)object
+{
+    static NSSet *supportedTypes = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        supportedTypes = [NSSet setWithArray:@[[NSDictionary class], [NSArray class], [NSString class], [NSNumber class], [NSDate class], [NSNull class]]];
+    });
+
+    for (Class class in supportedTypes)
+    {
+        if ([object isKindOfClass:class])
+        {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+
 - (BOOL)setObject:(id)object forKey:(id)key
 {
+    NSAssert([self objectIsOfSupportedType:object], @"%@ can't store object of type.", NSStringFromClass([self class]), [object class]);
+
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
