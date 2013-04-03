@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.1
+//  Version 1.3.2
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -74,6 +74,8 @@
 
 - (BOOL)setObject:(id)object forKey:(id)key
 {
+    NSParameterAssert(key);
+
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
@@ -98,12 +100,9 @@
                                                          options:0
                                                            error:&error];
     }
-    if (object && !data)
-    {
-        NSLog(@"FXKeychain failed to encode object for key '%@', error: %@", key, error);
-        return NO;
-    }
-    
+
+    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
+
     //delete existing data
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
     
@@ -138,6 +137,8 @@
 
 - (id)objectForKey:(id)key
 {
+    NSParameterAssert(key);
+
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
