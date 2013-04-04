@@ -1,3 +1,7 @@
+Version 1.3.2
+
+- Now throws an exception if you try to encode an invalid object type instead of merely logging to console
+
 Version 1.3.1
 
 - Fixed singleton implementation

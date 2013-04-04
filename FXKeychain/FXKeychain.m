@@ -101,6 +101,7 @@
                                                            error:&error];
     }
 
+    //fail if object is invalid
     NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
 
     //delete existing data
