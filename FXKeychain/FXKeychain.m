@@ -102,7 +102,7 @@
     }
 
     //fail if object is invalid
-    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
+    NSAssert(object == nil || (object != nil && data != nil), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
 
     //delete existing data
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
@@ -170,12 +170,12 @@
             //data represents an NSCoded archive. don't trust it
             object = nil;
         }
-        else if (!object)
+        else if (object == nil)
         {
             //may be a string
             object = [[NSString alloc] initWithData:(__bridge NSData *)data encoding:NSUTF8StringEncoding];
         }
-        if (!object)
+        if (object == nil)
         {
              NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
         }

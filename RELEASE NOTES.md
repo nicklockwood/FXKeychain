@@ -1,3 +1,7 @@
+Version 1.3.3
+
+- Fixed `if (!object)` because it casts the object to char and may lead to a bug with some pointers.
+
 Version 1.3.2
 
 - Now throws an exception if you try to encode an invalid object type instead of merely logging to console
