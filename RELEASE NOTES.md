@@ -1,3 +1,11 @@
+Version 1.3.2
+
+- Now throws an exception if you try to encode an invalid object type instead of merely logging to console
+
+Version 1.3.1
+
+- Fixed singleton implementation
+
 Version 1.3
 
 - Removed ability to store arbitrary classes in keychain for security reasons (see README). It is still possible to store dictionaries, arrays, etc.
