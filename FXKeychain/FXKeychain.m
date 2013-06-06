@@ -197,7 +197,8 @@
     //recover data
     CFDataRef data = NULL;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
-	if (status != errSecSuccess) {
+	
+	if (status != errSecSuccess && status != errSecItemNotFound) {
 		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
 	}
 	return data;
