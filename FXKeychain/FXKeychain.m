@@ -153,6 +153,11 @@
     else
     {
         //delete existing data
+        
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED
+        
+        OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
+#else
         CFTypeRef result = NULL;
         query[(__bridge id)kSecReturnRef] = (__bridge id)kCFBooleanTrue;
         OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
@@ -161,6 +166,7 @@
             status = SecKeychainItemDelete((SecKeychainItemRef) result);
             CFRelease(result);
         }
+#endif
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
