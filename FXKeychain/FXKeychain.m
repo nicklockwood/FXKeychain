@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.2
+//  Version 1.3.3
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -72,6 +72,30 @@
     return self;
 }
 
+- (NSData *)dataForKey:(id)key
+{
+	//generate query
+    NSMutableDictionary *query = [NSMutableDictionary dictionary];
+    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
+    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
+    query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+    query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
+    query[(__bridge NSString *)kSecAttrAccount] = [key description];
+    
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
+    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+#endif
+    
+    //recover data
+    CFDataRef data = NULL;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
+	if (status != errSecSuccess && status != errSecItemNotFound)
+    {
+		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
+	}
+	return CFBridgingRelease(data);
+}
+
 - (BOOL)setObject:(id)object forKey:(id)key
 {
     NSParameterAssert(key);
@@ -104,22 +128,42 @@
     //fail if object is invalid
     NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
 
-    //write data
     if (data)
     {
+        //write data
 		OSStatus status = errSecSuccess;
-		if ([self FXKeychain_dataForKey:key]) {
-			// there's already existing data for this key, update it
-			NSDictionary *update = @{(__bridge NSString *)kSecValueData : data};
+		if ([self dataForKey:key])
+        {
+			//there's already existing data for this key, update it
+			NSDictionary *update = @{(__bridge NSString *)kSecValueData: data};
 			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
-		} else {
-			// no existing data, add a new item
+		}
+        else
+        {
+			//no existing data, add a new item
 			query[(__bridge NSString *)kSecValueData] = data;
 			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
 		}
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
+            return NO;
+        }
+    }
+    else
+    {
+        //delete existing data
+        CFTypeRef result = NULL;
+        query[(__bridge id)kSecReturnRef] = (__bridge id)kCFBooleanTrue;
+        OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+        if (status == errSecSuccess)
+        {
+            status = SecKeychainItemDelete((SecKeychainItemRef) result);
+            CFRelease(result);
+        }
+        if (status != errSecSuccess)
+        {
+            NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
             return NO;
         }
     }
@@ -138,18 +182,15 @@
 
 - (id)objectForKey:(id)key
 {
-    NSParameterAssert(key);
-
-    CFDataRef data = [self FXKeychain_dataForKey:key];
-	id object = nil;
-    NSError *error = nil;
+    NSData *data = [self dataForKey:key];
     if (data)
     {
         //attempt to decode as a plist
-        object = [NSPropertyListSerialization propertyListWithData:(__bridge NSData *)data
-                                                           options:NSPropertyListImmutable
-                                                            format:NULL
-                                                             error:&error];
+        NSError *error = nil;
+        id object = [NSPropertyListSerialization propertyListWithData:data
+                                                              options:NSPropertyListImmutable
+                                                               format:NULL
+                                                                error:&error];
         
         if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
         {
@@ -159,13 +200,12 @@
         else if (!object)
         {
             //may be a string
-            object = [[NSString alloc] initWithData:(__bridge NSData *)data encoding:NSUTF8StringEncoding];
+            object = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         }
         if (!object)
         {
              NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
         }
-        CFRelease(data);
         return object;
     }
     else
@@ -178,30 +218,6 @@
 - (id)objectForKeyedSubscript:(id)key
 {
     return [self objectForKey:key];
-}
-
-- (CFDataRef)FXKeychain_dataForKey:(id)key
-{
-	//generate query
-    NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
-    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
-    query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-    query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    query[(__bridge NSString *)kSecAttrAccount] = [key description];
-    
-#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
-    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
-#endif
-    
-    //recover data
-    CFDataRef data = NULL;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
-	
-	if (status != errSecSuccess && status != errSecItemNotFound) {
-		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
-	}
-	return data;
 }
 
 @end
