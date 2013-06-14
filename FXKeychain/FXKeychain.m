@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.3
+//  Version 1.3.4
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -115,9 +115,18 @@
     NSError *error = nil;
     if ([(id)object isKindOfClass:[NSString class]])
     {
-        data = [(NSString *)object dataUsingEncoding:NSUTF8StringEncoding];
+        //check that string data does not represent a binary plist
+        NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
+        NSData *plistData = [object dataUsingEncoding:NSUTF8StringEncoding];
+        if (plistData && ([NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListImmutable format:&format error:NULL] == nil || format != NSPropertyListBinaryFormat_v1_0))
+        {
+            //safe to encode as a string
+            data = [object dataUsingEncoding:NSUTF8StringEncoding];
+        }
     }
-    else if (object)
+    
+    //if not encoded as a string, encode as plist
+    if (object && !data)
     {
         data = [NSPropertyListSerialization dataWithPropertyList:object
                                                           format:NSPropertyListBinaryFormat_v1_0
@@ -193,9 +202,10 @@
     {
         //attempt to decode as a plist
         NSError *error = nil;
+        NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
         id object = [NSPropertyListSerialization propertyListWithData:data
                                                               options:NSPropertyListImmutable
-                                                               format:NULL
+                                                               format:&format
                                                                 error:&error];
         
         if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
@@ -203,7 +213,7 @@
             //data represents an NSCoded archive. don't trust it
             object = nil;
         }
-        else if (!object)
+        else if (!object || format != NSPropertyListBinaryFormat_v1_0)
         {
             //may be a string
             object = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
