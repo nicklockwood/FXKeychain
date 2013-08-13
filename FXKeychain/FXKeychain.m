@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.2
+//  Version 1.3.4
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -72,6 +72,30 @@
     return self;
 }
 
+- (NSData *)dataForKey:(id)key
+{
+	//generate query
+    NSMutableDictionary *query = [NSMutableDictionary dictionary];
+    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
+    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
+    query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+    query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
+    query[(__bridge NSString *)kSecAttrAccount] = [key description];
+    
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
+    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+#endif
+    
+    //recover data
+    CFDataRef data = NULL;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
+	if (status != errSecSuccess && status != errSecItemNotFound)
+    {
+		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
+	}
+	return CFBridgingRelease(data);
+}
+
 - (BOOL)setObject:(id)object forKey:(id)key
 {
     NSParameterAssert(key);
@@ -91,9 +115,18 @@
     NSError *error = nil;
     if ([(id)object isKindOfClass:[NSString class]])
     {
-        data = [(NSString *)object dataUsingEncoding:NSUTF8StringEncoding];
+        //check that string data does not represent a binary plist
+        NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
+        NSData *plistData = [object dataUsingEncoding:NSUTF8StringEncoding];
+        if (plistData && ([NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListImmutable format:&format error:NULL] == nil || format != NSPropertyListBinaryFormat_v1_0))
+        {
+            //safe to encode as a string
+            data = [object dataUsingEncoding:NSUTF8StringEncoding];
+        }
     }
-    else if (object)
+    
+    //if not encoded as a string, encode as plist
+    if (object && !data)
     {
         data = [NSPropertyListSerialization dataWithPropertyList:object
                                                           format:NSPropertyListBinaryFormat_v1_0
@@ -104,24 +137,50 @@
     //fail if object is invalid
     NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
 
-    //delete existing data
-    OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
-    
-    //write data
     if (data)
     {
-        query[(__bridge NSString *)kSecValueData] = data;
-        status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
+        //write data
+		OSStatus status = errSecSuccess;
+		if ([self dataForKey:key])
+        {
+			//there's already existing data for this key, update it
+			NSDictionary *update = @{(__bridge NSString *)kSecValueData: data};
+			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
+		}
+        else
+        {
+			//no existing data, add a new item
+			query[(__bridge NSString *)kSecValueData] = data;
+			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
+		}
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
             return NO;
         }
     }
-    else if (status != errSecSuccess)
+    else
     {
-        NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
-        return NO;
+        //delete existing data
+        
+#if defined __IPHONE_OS_VERSION_MAX_ALLOWED
+        
+        OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
+#else
+        CFTypeRef result = NULL;
+        query[(__bridge id)kSecReturnRef] = (__bridge id)kCFBooleanTrue;
+        OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+        if (status == errSecSuccess)
+        {
+            status = SecKeychainItemDelete((SecKeychainItemRef) result);
+            CFRelease(result);
+        }
+#endif
+        if (status != errSecSuccess)
+        {
+            NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
+            return NO;
+        }
     }
     return YES;
 }
@@ -138,48 +197,31 @@
 
 - (id)objectForKey:(id)key
 {
-    NSParameterAssert(key);
-
-    //generate query
-    NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
-    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
-    query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-    query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
-    query[(__bridge NSString *)kSecAttrAccount] = [key description];
-    
-#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
-    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
-#endif
-    
-    //recover data
-    id object = nil;
-    NSError *error = nil;
-    CFDataRef data = nil;
-    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
-    if (status == errSecSuccess && data)
+    NSData *data = [self dataForKey:key];
+    if (data)
     {
         //attempt to decode as a plist
-        object = [NSPropertyListSerialization propertyListWithData:(__bridge NSData *)data
-                                                           options:NSPropertyListImmutable
-                                                            format:NULL
-                                                             error:&error];
+        NSError *error = nil;
+        NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
+        id object = [NSPropertyListSerialization propertyListWithData:data
+                                                              options:NSPropertyListImmutable
+                                                               format:&format
+                                                                error:&error];
         
         if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
         {
             //data represents an NSCoded archive. don't trust it
             object = nil;
         }
-        else if (!object)
+        else if (!object || format != NSPropertyListBinaryFormat_v1_0)
         {
             //may be a string
-            object = [[NSString alloc] initWithData:(__bridge NSData *)data encoding:NSUTF8StringEncoding];
+            object = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         }
         if (!object)
         {
              NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
         }
-        CFRelease(data);
         return object;
     }
     else

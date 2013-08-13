@@ -1,3 +1,12 @@
+Version 1.3.4
+
+- Fixed bug where passwords containing certain special characters could be wrongly interpreted as a property list when loading
+- Added code to prevent injection attacks based on users supplying a password containing binary plist data
+
+Version 1.3.3
+
+- Fixed issue with deleting keychain items on Mac OS
+
 Version 1.3.2
 
 - Now throws an exception if you try to encode an invalid object type instead of merely logging to console
