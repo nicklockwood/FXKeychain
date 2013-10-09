@@ -10,7 +10,7 @@
 
 @implementation AppDelegate
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+- (void)applicationDidFinishLaunching:(__unused NSNotification *)aNotification
 {
     // Insert code here to initialize your application
 }
