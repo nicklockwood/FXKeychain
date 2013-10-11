@@ -1,6 +1,6 @@
 FXKeychain
 
-Version 1.3.4, June 14th, 2013
+Version 1.4, October 11th, 2013
 
 Copyright (C) 2012 Charcoal Design
 

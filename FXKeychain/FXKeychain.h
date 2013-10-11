@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.3.4
+//  Version 1.4
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -35,12 +35,28 @@
 #import <Security/Security.h>
 
 
+typedef NS_ENUM(NSInteger, FXKeychainAccess)
+{
+    FXKeychainAccessibleWhenUnlocked = 0,
+    FXKeychainAccessibleAfterFirstUnlock,
+    FXKeychainAccessibleAlways,
+    FXKeychainAccessibleWhenUnlockedThisDeviceOnly,
+    FXKeychainAccessibleAfterFirstUnlockThisDeviceOnly,
+    FXKeychainAccessibleAlwaysThisDeviceOnly
+};
+
+
 @interface FXKeychain : NSObject
 
 + (instancetype)defaultKeychain;
 
 @property (nonatomic, copy, readonly) NSString *service;
 @property (nonatomic, copy, readonly) NSString *accessGroup;
+@property (nonatomic, readonly) FXKeychainAccess accessibility;
+
+- (id)initWithService:(NSString *)service
+          accessGroup:(NSString *)accessGroup
+        accessibility:(FXKeychainAccess)accessibility;
 
 - (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup;

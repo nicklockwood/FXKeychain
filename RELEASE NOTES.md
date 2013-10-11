@@ -1,3 +1,7 @@
+Version 1.4
+
+- Added access parameter for optionally allowing keychain access when device is locked
+
 Version 1.3.4
 
 - Fixed bug where passwords containing certain special characters could be wrongly interpreted as a property list when loading
