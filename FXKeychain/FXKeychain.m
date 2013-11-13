@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.3.4
+//  Version 1.4
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -64,10 +64,20 @@
 - (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup
 {
+    return [self initWithService:service
+                     accessGroup:accessGroup
+                   accessibility:FXKeychainAccessibleWhenUnlocked];
+}
+
+- (id)initWithService:(NSString *)service
+          accessGroup:(NSString *)accessGroup
+        accessibility:(FXKeychainAccess)accessibility
+{
     if ((self = [super init]))
     {
         _service = [service copy];
         _accessGroup = [accessGroup copy];
+        _accessibility = accessibility;
     }
     return self;
 }
@@ -81,8 +91,8 @@
     query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
-    
-#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
+
+#if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
 #endif
     
@@ -106,7 +116,7 @@
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
     
-#if defined __IPHONE_OS_VERSION_MAX_ALLOWED && !TARGET_IPHONE_SIMULATOR
+#if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
 #endif
     
@@ -139,18 +149,30 @@
 
     if (data)
     {
+        //update values
+        NSMutableDictionary *update = [@{(__bridge NSString *)kSecValueData: data} mutableCopy];
+        
+#if TARGET_OS_IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED > __MAC_10_8
+        
+        update[(__bridge NSString *)kSecAttrAccessible] = @[(__bridge id)kSecAttrAccessibleWhenUnlocked,
+                                                            (__bridge id)kSecAttrAccessibleAfterFirstUnlock,
+                                                            (__bridge id)kSecAttrAccessibleAlways,
+                                                            (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                                                            (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+                                                            (__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly][_accessibility];
+#endif
+        
         //write data
 		OSStatus status = errSecSuccess;
 		if ([self dataForKey:key])
         {
 			//there's already existing data for this key, update it
-			NSDictionary *update = @{(__bridge NSString *)kSecValueData: data};
 			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
 		}
         else
         {
 			//no existing data, add a new item
-			query[(__bridge NSString *)kSecValueData] = data;
+            [query addEntriesFromDictionary:update];
 			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
 		}
         if (status != errSecSuccess)
@@ -163,7 +185,7 @@
     {
         //delete existing data
         
-#if defined __IPHONE_OS_VERSION_MAX_ALLOWED
+#if TARGET_OS_IPHONE
         
         OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
 #else

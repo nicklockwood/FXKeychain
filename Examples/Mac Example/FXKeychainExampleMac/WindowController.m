@@ -20,19 +20,19 @@
 
 @implementation WindowController
 
-- (IBAction)save:(id)sender
+- (IBAction)save:(__unused id)sender
 {
     //save data
     [FXKeychain defaultKeychain][[_keyField stringValue]] = [_dataField stringValue];
 }
 
-- (IBAction)load:(id)sender
+- (IBAction)load:(__unused id)sender
 {
     //load data
     [_dataField setStringValue:[FXKeychain defaultKeychain][[_keyField stringValue]] ?: @""];
 }
 
-- (IBAction)delete:(id)sender
+- (IBAction)delete:(__unused id)sender
 {
     //clear field
     [_dataField setStringValue:@""];

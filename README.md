@@ -9,7 +9,7 @@ FXKeychain treats the keychain like a simple dictionary that you can set and get
 Supported iOS & SDK Versions
 -----------------------------
 
-* Supported build target - iOS 6.0 / Mac OS 10.8 (Xcode 4.5.2, Apple LLVM compiler 4.1)
+* Supported build target - iOS 7.0 / Mac OS 10.8 (Xcode 5.0, Apple LLVM compiler 5.0)
 * Earliest supported deployment target - iOS 5.0 / Mac OS 10.7
 * Earliest compatible deployment target - iOS 4.3 / Mac OS 10.6
 
@@ -51,7 +51,11 @@ The service property is used to distinguish between multiple apps or services on
     
     @property (nonatomic, copy, readonly) NSString *accessGroup;
 
-The accessGroup value is used for sharing a keychain between multiple iOS apps from the same vendor. See Apple's documentation for acceptable values to use for the accessGroup. Leave this value nil if you do not intend to share the keychain between apps. On Mac OS, the keychain is already shared between apps, so this property has no effect.
+The accessGroup property is used for sharing a keychain between multiple iOS apps from the same vendor. See Apple's documentation for acceptable values to use for the accessGroup. Leave this value nil if you do not intend to share the keychain between apps. On Mac OS, the keychain is already shared between apps, so this property has no effect.
+
+    @property (nonatomic, readonly) FXKeychainAccess accessibility;
+
+The accessibility property is used for controlling access to the keychain when the device is locked. See FXKeychainAccess values description below for possible values. On Mac OS, prior to 10.9 (Mavericks) this property has no effect.
 
 
 Methods
@@ -63,8 +67,12 @@ This method returns a shared default keychain instance, which uses the app's bun
     
     - (id)initWithService:(NSString *)service
               accessGroup:(NSString *)accessGroup;
-              
-This method creates a new FXKeychain instance with the specified parameters. Each FXKeychain can contain as many key/value pairs as you want, so you probably only need a single FXKeychain per application. Each FXKeychain is uniquely identified by the service parameter; see the Properties description for how to use this. You can specify nil for the service, in which case it will act as "wildcard" selector and calls to objectForKey: will return the first value found within any service stored in the keychain. The accessGroup parameter is used for setting up shared keychains that can be accessed by multiple different apps; leave this as nil if you do not require that functionality.
+
+    - (id)initWithService:(NSString *)service
+              accessGroup:(NSString *)accessGroup
+            accessibility:(FXKeychainAccess)accessibility;
+
+This method creates a new FXKeychain instance with the specified parameters. Each FXKeychain can contain as many key/value pairs as you want, so you probably only need a single FXKeychain per application. Each FXKeychain is uniquely identified by the service parameter; see the Properties description for how to use this. You can specify nil for the service, in which case it will act as "wildcard" selector and calls to objectForKey: will return the first value found within any service stored in the keychain. The accessGroup parameter is used for setting up shared keychains that can be accessed by multiple different apps; leave this as nil if you do not require that functionality. The optional accessibility property controls whether the keychain items can be accessed if the app is launched in the background when the device is locked (see FXKeychainAccess values description below for details).
     
     - (BOOL)setObject:(id)object forKey:(id)key;
     - (BOOL)setObject:(id)object forKeyedSubscript:(id)key;
@@ -79,3 +87,25 @@ This method deletes the specified key from the keychain.
     - (id)objectForKeyedSubscript:(id)key;
 
 This method returns the value for the specified key from the keychain. If the key does not exist it will return nil. The second form of this method is functionally identical to the first, but is included to support the modern objective C keyed subscripting syntax.
+
+
+FXKeychainAccess values
+--------------------------------
+
+    FXKeychainAccessibleWhenUnlocked
+    
+This is the default value. Keychain items set with this accessibility level can only be accessed when the device is unlocked. If your app needs to access the keychain when running in the background, this may cause problems.
+    
+    FXKeychainAccessibleAfterFirstUnlock
+    
+Keychain items set with this accessibility level can be accessed once the keychain has been unlocked, and will remain accessible until the device is restarted, even if the device is locked again in the meantime. This is a good choice for items that need to be accessed by background services.
+    
+    FXKeychainAccessibleAlways
+    
+Keychain items set with this accessibility level can be accessed at any time. This isn't very secure compared with the other options, but it's still better than storing values in plain text in the file system!
+    
+    FXKeychainAccessibleWhenUnlockedThisDeviceOnly
+    FXKeychainAccessibleAfterFirstUnlockThisDeviceOnly
+    FXKeychainAccessibleAlwaysThisDeviceOnly
+    
+These values behave the same way as their non-ThisDeviceOnly counterparts, except that they are not backed up and restored if the device is reset or upgraded, and are therefore more secure (but also less reliable).
