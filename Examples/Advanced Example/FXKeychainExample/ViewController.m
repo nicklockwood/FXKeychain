@@ -14,11 +14,11 @@
 
 @property (nonatomic, strong) FXKeychain *keychain;
 
-@property (nonatomic, weak) IBOutlet UITextField *serviceField;
-@property (nonatomic, weak) IBOutlet UITextField *accessGroupField;
+@property (nonatomic, strong) IBOutlet UITextField *serviceField;
+@property (nonatomic, strong) IBOutlet UITextField *accessGroupField;
 
-@property (nonatomic, weak) IBOutlet UITextField *keyField;
-@property (nonatomic, weak) IBOutlet UITextView *dataField;
+@property (nonatomic, strong) IBOutlet UITextField *keyField;
+@property (nonatomic, strong) IBOutlet UITextView *dataField;
 
 @end
 
@@ -31,9 +31,9 @@
 	
     //get settings from NSUserDefaults
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    _serviceField.text = [defaults objectForKey:@"service"] ?: [[NSBundle mainBundle] bundleIdentifier];
-    _accessGroupField.text = [defaults objectForKey:@"accessGroup"];
-    _keyField.text = [defaults objectForKey:@"key"] ?: @"password";
+    self.serviceField.text = [defaults objectForKey:@"service"] ?: [[NSBundle mainBundle] bundleIdentifier];
+    self.accessGroupField.text = [defaults objectForKey:@"accessGroup"];
+    self.keyField.text = [defaults objectForKey:@"key"] ?: @"password";
     
     //load data
     [self load];
@@ -43,17 +43,17 @@
 {
     //preserve settings in NSUserDefaults
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:_serviceField.text forKey:@"service"];
-    [defaults setObject:_accessGroupField.text forKey:@"accessGroup"];
-    [defaults setObject:_keyField.text forKey:@"key"];
+    [defaults setObject:self.serviceField.text forKey:@"service"];
+    [defaults setObject:self.accessGroupField.text forKey:@"accessGroup"];
+    [defaults setObject:self.keyField.text forKey:@"key"];
     [defaults synchronize];
 }
 
 - (void)updateKeychainFromFields
 {
     //create keychain
-    _keychain = [[FXKeychain alloc] initWithService:_serviceField.text
-                                        accessGroup:_accessGroupField.text];
+    self.keychain = [[FXKeychain alloc] initWithService:self.serviceField.text
+                                            accessGroup:self.accessGroupField.text];
 }
 
 - (IBAction)save
@@ -65,7 +65,7 @@
     [self updateKeychainFromFields];
     
     //save data
-    _keychain[_keyField.text] = _dataField.text;
+    self.keychain[self.keyField.text] = self.dataField.text;
 }
 
 - (IBAction)load
@@ -74,27 +74,27 @@
     [self updateKeychainFromFields];
     
     //load data
-    _dataField.text = _keychain[_keyField.text];
+    self.dataField.text = self.keychain[self.keyField.text];
 }
 
 - (IBAction)delete
 {
     //clear data
-    _dataField.text = @"";
+    self.dataField.text = @"";
     
     //update keychain
     [self updateKeychainFromFields];
     
     //save data
-    [_keychain removeObjectForKey:_keyField.text];
+    [self.keychain removeObjectForKey:self.keyField.text];
 }
 
 - (IBAction)tap
 {
-    [_serviceField resignFirstResponder];
-    [_accessGroupField resignFirstResponder];
-    [_keyField resignFirstResponder];
-    [_dataField resignFirstResponder];
+    [self.serviceField resignFirstResponder];
+    [self.accessGroupField resignFirstResponder];
+    [self.keyField resignFirstResponder];
+    [self.dataField resignFirstResponder];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField

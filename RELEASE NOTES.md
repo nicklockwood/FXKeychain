@@ -1,3 +1,11 @@
+Version 1.5
+
+- The accessibility property is now readwrite, allowing you to change accessibility on a per-property basis. Note that changing the value will only affect keys that are set subsequent to the change.
+- NSNull values are now stripped when saving if NSCoding is disabled, avoiding a possible cause of encoding failure in otherwise valid code
+- Restored support for NSCoding, but this is enabled by default on iOS only. You can enable it for Mac OS using a precompiler macro, but this is not recommended for security reasons
+- Suppressed some console warnings that would occur if password contained an = character
+- Now complies with -Weveything warning level
+
 Version 1.4
 
 - Added access parameter for optionally allowing keychain access when device is locked

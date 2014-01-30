@@ -9,7 +9,7 @@ FXKeychain treats the keychain like a simple dictionary that you can set and get
 Supported iOS & SDK Versions
 -----------------------------
 
-* Supported build target - iOS 7.0 / Mac OS 10.8 (Xcode 5.0, Apple LLVM compiler 5.0)
+* Supported build target - iOS 7.0 / Mac OS 10.9 (Xcode 5.0, Apple LLVM compiler 5.0)
 * Earliest supported deployment target - iOS 5.0 / Mac OS 10.7
 * Earliest compatible deployment target - iOS 4.3 / Mac OS 10.6
 
@@ -35,27 +35,27 @@ Security
 
 Caution is advised when storing and retrieving non-string objects from the keychain. On iOS, the keychain is sandboxed to a single app or to a group of apps shared by a single developer. But on Mac OS, any app can read or write to any entry in the keychain. This offers the potential for a malicious app to attempt to manipulate the behaviour of another by changing its keychain data.
 
-Version 1.2 and earlier of FXKeychain allowed arbitrary classes to be stored in the keychain using NSCoding. This feature has been removed in 1.3 to mitigate the risk that an app might change the encoded classes in your app's keychain in order to get it to load and run code that it isn't supposed to.
+Version 1.2 and earlier of FXKeychain allowed arbitrary classes to be stored in the keychain using NSCoding. This feature was removed in 1.3 to mitigate the risk that an app might change the encoded classes in your app's keychain in order to get it to load and run code that it isn't supposed to. In version 1.5, the feature has been restored but is controlled by the FXKEYCHAIN_USE_NSCODING macro. It is enabld by default on iOS (which is sandboxed and therefore relatively safe) and disabled by default on Mac OS (which isn't).
 
-Using version 1.3 should protect you from this, as only plist-compatible classes are now supported, which cannot easily be used in a malicious way. It is still recommended however that you verify that the data being loaded from the keychain  matches the type and structure that you are expecting in order to protect against malicious or mischevious tinkering with the data that might crash your app or cause it to behave strangely.
+Code injection is a low risk on iOS (unless the device is jailbroken). On Mac OS, using version 1.3 or above should protect you from code injection, as only plist-compatible classes are now supported by default, which cannot easily be used in a malicious way. It is still recommended however that you verify that the data being loaded from the keychain  matches the type and structure that you are expecting in order to protect against malicious or mischevious tinkering with the data that might crash your app or cause it to behave strangely.
 
 
 Properties
 ------------------
     
-FXKeychain has the following properties. They are all immutable once the keychain has been created.
+FXKeychain has the following properties:
         
     @property (nonatomic, copy, readonly) NSString *service;
     
-The service property is used to distinguish between multiple apps or services on a given device or within the same app. On Mac OS and the iOS simulator, services are shared between apps, so it's a good idea to use something unique for the service, such as the application bundle ID, or the same value as the accessGroup if you wish to share a service between multiple apps.
+The service property is used to distinguish between multiple apps or services on a given device or within the same app. On Mac OS and the iOS simulator, services are shared between apps, so it's a good idea to use something unique for the service, such as the application bundle ID, or the same value as the accessGroup if you wish to share a service between multiple apps. The service value cannot be changed after the keychain has been created.
     
     @property (nonatomic, copy, readonly) NSString *accessGroup;
 
-The accessGroup property is used for sharing a keychain between multiple iOS apps from the same vendor. See Apple's documentation for acceptable values to use for the accessGroup. Leave this value nil if you do not intend to share the keychain between apps. On Mac OS, the keychain is already shared between apps, so this property has no effect.
+The accessGroup property is used for sharing a keychain between multiple iOS apps from the same vendor. See Apple's documentation for acceptable values to use for the accessGroup. Leave this value nil if you do not intend to share the keychain between apps. On Mac OS, the keychain is already shared between apps, so this property has no effect. The accessGroup cannot be changed after the keychain has been created.
 
-    @property (nonatomic, readonly) FXKeychainAccess accessibility;
+    @property (nonatomic, assign) FXKeychainAccess accessibility;
 
-The accessibility property is used for controlling access to the keychain when the device is locked. See FXKeychainAccess values description below for possible values. On Mac OS, prior to 10.9 (Mavericks) this property has no effect.
+The accessibility property is used for controlling access to the keychain when the device is locked. See FXKeychainAccess values description below for possible values. On Mac OS, prior to 10.9 (Mavericks) this property has no effect. Unlike the other attributes, the accessibility property can be changed at any time, however, changes will only affect keys that are set subsequent to the change; existing keys in the keychain will not be affected unless they are re-written.
 
 
 Methods
