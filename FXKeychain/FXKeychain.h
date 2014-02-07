@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.4
+//  Version 1.5 beta
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -35,6 +35,19 @@
 #import <Security/Security.h>
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wobjc-missing-property-synthesis"
+
+
+#ifndef FXKEYCHAIN_USE_NSCODING
+#if TARGET_OS_IPHONE
+#define FXKEYCHAIN_USE_NSCODING 1
+#else
+#define FXKEYCHAIN_USE_NSCODING 0
+#endif
+#endif
+
+
 typedef NS_ENUM(NSInteger, FXKeychainAccess)
 {
     FXKeychainAccessibleWhenUnlocked = 0,
@@ -50,9 +63,9 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 
 + (instancetype)defaultKeychain;
 
-@property (nonatomic, copy, readonly) NSString *service;
-@property (nonatomic, copy, readonly) NSString *accessGroup;
-@property (nonatomic, readonly) FXKeychainAccess accessibility;
+@property (nonatomic, readonly) NSString *service;
+@property (nonatomic, readonly) NSString *accessGroup;
+@property (nonatomic, assign) FXKeychainAccess accessibility;
 
 - (id)initWithService:(NSString *)service
           accessGroup:(NSString *)accessGroup
@@ -68,3 +81,7 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (id)objectForKeyedSubscript:(id)key;
 
 @end
+
+
+#pragma GCC diagnostic pop
+

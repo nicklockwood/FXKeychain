@@ -12,8 +12,8 @@
 
 @interface WindowController ()
 
-@property (nonatomic, weak) IBOutlet NSTextField *keyField;
-@property (nonatomic, weak) IBOutlet NSTextField *dataField;
+@property (nonatomic, strong) IBOutlet NSTextField *keyField;
+@property (nonatomic, strong) IBOutlet NSTextField *dataField;
 
 @end
 
@@ -23,22 +23,22 @@
 - (IBAction)save:(__unused id)sender
 {
     //save data
-    [FXKeychain defaultKeychain][[_keyField stringValue]] = [_dataField stringValue];
+    [FXKeychain defaultKeychain][[self.keyField stringValue]] = [self.dataField stringValue];
 }
 
 - (IBAction)load:(__unused id)sender
 {
     //load data
-    [_dataField setStringValue:[FXKeychain defaultKeychain][[_keyField stringValue]] ?: @""];
+    [self.dataField setStringValue:[FXKeychain defaultKeychain][[self.keyField stringValue]] ?: @""];
 }
 
 - (IBAction)delete:(__unused id)sender
 {
     //clear field
-    [_dataField setStringValue:@""];
+    [self.dataField setStringValue:@""];
     
     //delete data
-    [[FXKeychain defaultKeychain] removeObjectForKey:[_keyField stringValue]];
+    [[FXKeychain defaultKeychain] removeObjectForKey:[self.keyField stringValue]];
 }
 
 @end

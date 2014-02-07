@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.4
+//  Version 1.5 beta
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -39,6 +39,58 @@
 #error This class requires automatic reference counting
 #endif
 
+
+@implementation NSObject (FXKeychainPropertyListCoding)
+
+- (id)FXKeychain_propertyListRepresentation
+{
+    return self;
+}
+
+@end
+
+#if !FXKEYCHAIN_USE_NSCODING
+
+@implementation NSNull (FXKeychainPropertyListCoding)
+
+- (id)FXKeychain_propertyListRepresentation
+{
+    return nil;
+}
+
+@end
+
+
+@implementation NSArray (BMPropertyListCoding)
+
+- (id)FXKeychain_propertyListRepresentation
+{
+    NSMutableArray *copy = [NSMutableArray arrayWithCapacity:[self count]];
+    [self enumerateObjectsUsingBlock:^(__unsafe_unretained id obj, __unused NSUInteger idx, __unused BOOL *stop) {
+        id value = [obj FXKeychain_propertyListRepresentation];
+        if (value) [copy addObject:value];
+    }];
+    return copy;
+}
+
+@end
+
+
+@implementation NSDictionary (BMPropertyListCoding)
+
+- (id)FXKeychain_propertyListRepresentation
+{
+    NSMutableDictionary *copy = [NSMutableDictionary dictionaryWithCapacity:[self count]];
+    [self enumerateKeysAndObjectsUsingBlock:^(__unsafe_unretained id key, __unsafe_unretained id obj, __unused BOOL *stop) {
+        id value = [obj FXKeychain_propertyListRepresentation];
+        if (value) copy[key] = value;
+    }];
+    return copy;
+}
+
+@end
+
+#endif
 
 @implementation FXKeychain
 
@@ -86,7 +138,7 @@
 {
 	//generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
+    if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
@@ -112,7 +164,7 @@
 
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([_service length]) query[(__bridge NSString *)kSecAttrService] = _service;
+    if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
     
@@ -127,8 +179,10 @@
     {
         //check that string data does not represent a binary plist
         NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
-        NSData *plistData = [object dataUsingEncoding:NSUTF8StringEncoding];
-        if (plistData && ([NSPropertyListSerialization propertyListWithData:plistData options:NSPropertyListImmutable format:&format error:NULL] == nil || format != NSPropertyListBinaryFormat_v1_0))
+        if (![object hasPrefix:@"bplist"] || ![NSPropertyListSerialization propertyListWithData:[object dataUsingEncoding:NSUTF8StringEncoding]
+                                                                                        options:NSPropertyListImmutable
+                                                                                         format:&format
+                                                                                          error:NULL])
         {
             //safe to encode as a string
             data = [object dataUsingEncoding:NSUTF8StringEncoding];
@@ -138,10 +192,20 @@
     //if not encoded as a string, encode as plist
     if (object && !data)
     {
-        data = [NSPropertyListSerialization dataWithPropertyList:object
+        data = [NSPropertyListSerialization dataWithPropertyList:[object FXKeychain_propertyListRepresentation]
                                                           format:NSPropertyListBinaryFormat_v1_0
                                                          options:0
                                                            error:&error];
+#if FXKEYCHAIN_USE_NSCODING
+        
+        //property list encoding failed. try NSCoding
+        if (!data)
+        {
+            data = [NSKeyedArchiver archivedDataWithRootObject:object];
+        }
+        
+#endif
+        
     }
 
     //fail if object is invalid
@@ -152,14 +216,14 @@
         //update values
         NSMutableDictionary *update = [@{(__bridge NSString *)kSecValueData: data} mutableCopy];
         
-#if TARGET_OS_IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED > __MAC_10_8
+#if TARGET_OS_IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_9
         
         update[(__bridge NSString *)kSecAttrAccessible] = @[(__bridge id)kSecAttrAccessibleWhenUnlocked,
                                                             (__bridge id)kSecAttrAccessibleAfterFirstUnlock,
                                                             (__bridge id)kSecAttrAccessibleAlways,
                                                             (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
                                                             (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-                                                            (__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly][_accessibility];
+                                                            (__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly][self.accessibility];
 #endif
         
         //write data
@@ -222,20 +286,35 @@
     NSData *data = [self dataForKey:key];
     if (data)
     {
-        //attempt to decode as a plist
+        id object = nil;
         NSError *error = nil;
         NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
-        id object = [NSPropertyListSerialization propertyListWithData:data
-                                                              options:NSPropertyListImmutable
-                                                               format:&format
-                                                                error:&error];
         
-        if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
+        //check if data is a binary plist
+        if ([data length] >= 6 && !strncmp("bplist", data.bytes, 6))
         {
-            //data represents an NSCoded archive. don't trust it
-            object = nil;
+            //attempt to decode as a plist
+            object = [NSPropertyListSerialization propertyListWithData:data
+                                                               options:NSPropertyListImmutable
+                                                                format:&format
+                                                                 error:&error];
+            
+            if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
+            {
+                //data represents an NSCoded archive
+                
+    #if FXKEYCHAIN_USE_NSCODING
+                
+                //parse as archive
+                object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    #else
+                //don't trust it
+                object = nil;
+    #endif
+                
+            }
         }
-        else if (!object || format != NSPropertyListBinaryFormat_v1_0)
+        if (!object || format != NSPropertyListBinaryFormat_v1_0)
         {
             //may be a string
             object = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];

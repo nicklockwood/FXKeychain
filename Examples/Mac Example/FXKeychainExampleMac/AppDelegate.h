@@ -10,7 +10,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
-@property (assign) IBOutlet NSWindow *window;
-@property (strong) IBOutlet NSWindowController *windowController;
+@property (nonatomic, assign) IBOutlet NSWindow *window;
+@property (nonatomic, strong) IBOutlet NSWindowController *windowController;
 
 @end
