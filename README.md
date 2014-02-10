@@ -30,6 +30,14 @@ Installation
 To use FXKeychain, just drag the class files into your project and add the Security framework. You can use the [FXKeychain defaultKeychain] shared instance, or create new instance as and when you need them.
 
 
+Thread Safety
+-----------------
+
+1. It is safe to use a given FXKeychain instance from any thread.
+2. Use a single FXKeychain instance per thread, do not access a single instance from more than one thread concurrently (including the default instance).
+3. If you have multiple FKKeychain instances that point to the same service, it is safe to read their values from multiple threads concurrently, but you should not attempt to write to the same key from two different threads concurrently.
+
+
 Security
 ------------
 
