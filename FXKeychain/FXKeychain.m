@@ -66,10 +66,11 @@
 - (id)FXKeychain_propertyListRepresentation
 {
     NSMutableArray *copy = [NSMutableArray arrayWithCapacity:[self count]];
-    [self enumerateObjectsUsingBlock:^(__unsafe_unretained id obj, __unused NSUInteger idx, __unused BOOL *stop) {
+    for (id obj in self)
+    {
         id value = [obj FXKeychain_propertyListRepresentation];
         if (value) [copy addObject:value];
-    }];
+    }
     return copy;
 }
 
@@ -82,6 +83,7 @@
 {
     NSMutableDictionary *copy = [NSMutableDictionary dictionaryWithCapacity:[self count]];
     [self enumerateKeysAndObjectsUsingBlock:^(__unsafe_unretained id key, __unsafe_unretained id obj, __unused BOOL *stop) {
+        
         id value = [obj FXKeychain_propertyListRepresentation];
         if (value) copy[key] = value;
     }];
@@ -146,7 +148,9 @@
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
 
 #if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+    
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+    
 #endif
     
     //recover data
@@ -170,7 +174,9 @@
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
     
 #if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+    
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+    
 #endif
     
     //encode object
