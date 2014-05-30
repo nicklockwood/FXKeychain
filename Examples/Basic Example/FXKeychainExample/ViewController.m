@@ -12,8 +12,8 @@
 
 @interface ViewController () <UITextFieldDelegate, UITextViewDelegate>
 
-@property (nonatomic, weak) IBOutlet UITextField *keyField;
-@property (nonatomic, weak) IBOutlet UITextView *dataField;
+@property (nonatomic, strong) IBOutlet UITextField *keyField;
+@property (nonatomic, strong) IBOutlet UITextView *dataField;
 
 @end
 
