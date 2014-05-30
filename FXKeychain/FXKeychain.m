@@ -245,7 +245,7 @@
             return NO;
         }
     }
-    else
+    else if (self[key])
     {
         //delete existing data
         
