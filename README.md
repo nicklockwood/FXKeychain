@@ -9,7 +9,7 @@ FXKeychain treats the keychain like a simple dictionary that you can set and get
 Supported iOS & SDK Versions
 -----------------------------
 
-* Supported build target - iOS 7.0 / Mac OS 10.9 (Xcode 5.0, Apple LLVM compiler 5.0)
+* Supported build target - iOS 7.1 / Mac OS 10.9 (Xcode 5.0, Apple LLVM compiler 5.1)
 * Earliest supported deployment target - iOS 5.0 / Mac OS 10.7
 * Earliest compatible deployment target - iOS 4.3 / Mac OS 10.6
 
@@ -117,3 +117,60 @@ Keychain items set with this accessibility level can be accessed at any time. Th
     FXKeychainAccessibleAlwaysThisDeviceOnly
     
 These values behave the same way as their non-ThisDeviceOnly counterparts, except that they are not backed up and restored if the device is reset or upgraded, and are therefore more secure (but also less reliable).
+
+
+Release Notes
+----------------
+
+Version 1.5.1
+
+- No longer logs a warning if you attempt to delete a key that doesn't exist
+
+Version 1.5
+
+- The accessibility property is now readwrite, allowing you to change accessibility on a per-property basis. Note that changing the value will only affect keys that are set subsequent to the change.
+- NSNull values are now stripped when saving if NSCoding is disabled, avoiding a possible cause of encoding failure in otherwise valid code
+- Restored support for NSCoding, but this is enabled by default on iOS only. You can enable it for Mac OS using a precompiler macro, but this is not recommended for security reasons
+- Suppressed some console warnings that would occur if password contained an = character
+- Now complies with -Weverything warning level
+
+Version 1.4
+
+- Added access parameter for optionally allowing keychain access when device is locked
+
+Version 1.3.4
+
+- Fixed bug where passwords containing certain special characters could be wrongly interpreted as a property list when loading
+- Added code to prevent injection attacks based on users supplying a password containing binary plist data
+
+Version 1.3.3
+
+- Fixed issue with deleting keychain items on Mac OS
+
+Version 1.3.2
+
+- Now throws an exception if you try to encode an invalid object type instead of merely logging to console
+
+Version 1.3.1
+
+- Fixed singleton implementation
+
+Version 1.3
+
+- Removed ability to store arbitrary classes in keychain for security reasons (see README). It is still possible to store dictionaries, arrays, etc.
+
+Version 1.2
+
+- It is now possible to actually store more than one value per FXKeychain
+- Removed account parameter (it didn't work the way I thought)
+
+Version 1.1
+
+- Now uses application bundle ID to namespace the default keychain
+- Now supports keyed subscripting (e.g. keychain["foo"] = bar;)
+- Included CocoaPods podspec file
+- Included Mac OS example
+
+Version 1.0
+
+- Initial release
