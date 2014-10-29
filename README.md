@@ -9,7 +9,7 @@ FXKeychain treats the keychain like a simple dictionary that you can set and get
 Supported iOS & SDK Versions
 -----------------------------
 
-* Supported build target - iOS 7.1 / Mac OS 10.9 (Xcode 5.0, Apple LLVM compiler 5.1)
+* Supported build target - iOS 8.0 / Mac OS 10.9 (Xcode 6.0, Apple LLVM compiler 6.0)
 * Earliest supported deployment target - iOS 5.0 / Mac OS 10.7
 * Earliest compatible deployment target - iOS 4.3 / Mac OS 10.6
 
@@ -121,6 +121,10 @@ These values behave the same way as their non-ThisDeviceOnly counterparts, excep
 
 Release Notes
 ----------------
+
+Version 1.5.2
+
+- Fixed issue on iOS 8 that may have caused crashes and made accessGroup not work correctly
 
 Version 1.5.1
 

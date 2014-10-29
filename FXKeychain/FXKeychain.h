@@ -1,7 +1,7 @@
 //
 //  FXKeychain.h
 //
-//  Version 1.5.1
+//  Version 1.5.2
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -39,6 +39,7 @@
 #pragma GCC diagnostic ignored "-Wobjc-missing-property-synthesis"
 
 
+#import <TargetConditionals.h>
 #ifndef FXKEYCHAIN_USE_NSCODING
 #if TARGET_OS_IPHONE
 #define FXKEYCHAIN_USE_NSCODING 1
