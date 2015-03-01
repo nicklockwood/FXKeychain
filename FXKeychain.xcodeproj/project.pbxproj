@@ -1,0 +1,396 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		72C617211AA3949C0085F425 /* FXKeychain.h in Headers */ = {isa = PBXBuildFile; fileRef = 72C617201AA3949C0085F425 /* FXKeychain.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72C617381AA394EE0085F425 /* FXKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C617371AA394EE0085F425 /* FXKeychain.m */; };
+		72C617571AA395470085F425 /* FXKeychain.h in Headers */ = {isa = PBXBuildFile; fileRef = 72C617201AA3949C0085F425 /* FXKeychain.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72C617581AA395480085F425 /* FXKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C617371AA394EE0085F425 /* FXKeychain.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		72C6171B1AA3949C0085F425 /* FXKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FXKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		72C6171F1AA3949C0085F425 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		72C617201AA3949C0085F425 /* FXKeychain.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FXKeychain.h; sourceTree = "<group>"; };
+		72C617371AA394EE0085F425 /* FXKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FXKeychain.m; sourceTree = "<group>"; };
+		72C6173E1AA3951C0085F425 /* FXKeychain.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FXKeychain.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		72C617171AA3949C0085F425 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72C6173A1AA3951C0085F425 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		72C617111AA3949C0085F425 = {
+			isa = PBXGroup;
+			children = (
+				72C6171D1AA3949C0085F425 /* FXKeychain */,
+				72C6171C1AA3949C0085F425 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		72C6171C1AA3949C0085F425 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				72C6171B1AA3949C0085F425 /* FXKeychain.framework */,
+				72C6173E1AA3951C0085F425 /* FXKeychain.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		72C6171D1AA3949C0085F425 /* FXKeychain */ = {
+			isa = PBXGroup;
+			children = (
+				72C617201AA3949C0085F425 /* FXKeychain.h */,
+				72C617371AA394EE0085F425 /* FXKeychain.m */,
+				72C6171E1AA3949C0085F425 /* Supporting Files */,
+			);
+			path = FXKeychain;
+			sourceTree = "<group>";
+		};
+		72C6171E1AA3949C0085F425 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				72C6171F1AA3949C0085F425 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		72C617181AA3949C0085F425 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72C617211AA3949C0085F425 /* FXKeychain.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72C6173B1AA3951C0085F425 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72C617571AA395470085F425 /* FXKeychain.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		72C6171A1AA3949C0085F425 /* FXKeychain-Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72C617311AA3949C0085F425 /* Build configuration list for PBXNativeTarget "FXKeychain-Mac" */;
+			buildPhases = (
+				72C617161AA3949C0085F425 /* Sources */,
+				72C617171AA3949C0085F425 /* Frameworks */,
+				72C617181AA3949C0085F425 /* Headers */,
+				72C617191AA3949C0085F425 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "FXKeychain-Mac";
+			productName = FXKeychain;
+			productReference = 72C6171B1AA3949C0085F425 /* FXKeychain.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		72C6173D1AA3951C0085F425 /* FXKeychain-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72C617511AA3951C0085F425 /* Build configuration list for PBXNativeTarget "FXKeychain-iOS" */;
+			buildPhases = (
+				72C617391AA3951C0085F425 /* Sources */,
+				72C6173A1AA3951C0085F425 /* Frameworks */,
+				72C6173B1AA3951C0085F425 /* Headers */,
+				72C6173C1AA3951C0085F425 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "FXKeychain-iOS";
+			productName = "FXKeychain-iOS";
+			productReference = 72C6173E1AA3951C0085F425 /* FXKeychain.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		72C617121AA3949C0085F425 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = "Charcoal Design";
+				TargetAttributes = {
+					72C6171A1AA3949C0085F425 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+					72C6173D1AA3951C0085F425 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 72C617151AA3949C0085F425 /* Build configuration list for PBXProject "FXKeychain" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 72C617111AA3949C0085F425;
+			productRefGroup = 72C6171C1AA3949C0085F425 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				72C6171A1AA3949C0085F425 /* FXKeychain-Mac */,
+				72C6173D1AA3951C0085F425 /* FXKeychain-iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		72C617191AA3949C0085F425 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72C6173C1AA3951C0085F425 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		72C617161AA3949C0085F425 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72C617381AA394EE0085F425 /* FXKeychain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72C617391AA3951C0085F425 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72C617581AA395480085F425 /* FXKeychain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		72C6172F1AA3949C0085F425 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		72C617301AA3949C0085F425 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		72C617321AA3949C0085F425 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = FXKeychain/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = FXKeychain;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		72C617331AA3949C0085F425 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = FXKeychain/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = FXKeychain;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		72C617521AA3951C0085F425 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = FXKeychain/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = FXKeychain;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		72C617531AA3951C0085F425 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = FXKeychain/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = FXKeychain;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		72C617151AA3949C0085F425 /* Build configuration list for PBXProject "FXKeychain" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72C6172F1AA3949C0085F425 /* Debug */,
+				72C617301AA3949C0085F425 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72C617311AA3949C0085F425 /* Build configuration list for PBXNativeTarget "FXKeychain-Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72C617321AA3949C0085F425 /* Debug */,
+				72C617331AA3949C0085F425 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72C617511AA3951C0085F425 /* Build configuration list for PBXNativeTarget "FXKeychain-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72C617521AA3951C0085F425 /* Debug */,
+				72C617531AA3951C0085F425 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 72C617121AA3949C0085F425 /* Project object */;
+}
