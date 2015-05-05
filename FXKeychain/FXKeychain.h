@@ -62,24 +62,24 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 
 @interface FXKeychain : NSObject
 
-+ (instancetype)defaultKeychain;
++ (nonnull instancetype)defaultKeychain;
 
-@property (nonatomic, readonly) NSString *service;
-@property (nonatomic, readonly) NSString *accessGroup;
+@property (nonatomic, readonly, nullable) NSString *service;
+@property (nonatomic, readonly, nullable) NSString *accessGroup;
 @property (nonatomic, assign) FXKeychainAccess accessibility;
 
-- (id)initWithService:(NSString *)service
-          accessGroup:(NSString *)accessGroup
-        accessibility:(FXKeychainAccess)accessibility;
+- (nonnull id)initWithService:(nullable NSString *)service
+                  accessGroup:(nullable NSString *)accessGroup
+                accessibility:(FXKeychainAccess)accessibility;
 
-- (id)initWithService:(NSString *)service
-          accessGroup:(NSString *)accessGroup;
+- (nonnull id)initWithService:(nullable NSString *)service
+                  accessGroup:(nullable NSString *)accessGroup;
 
-- (BOOL)setObject:(id)object forKey:(id)key;
-- (BOOL)setObject:(id)object forKeyedSubscript:(id)key;
-- (BOOL)removeObjectForKey:(id)key;
-- (id)objectForKey:(id)key;
-- (id)objectForKeyedSubscript:(id)key;
+- (BOOL)setObject:(nullable id)object forKey:(nonnull id)key;
+- (BOOL)setObject:(nullable id)object forKeyedSubscript:(nonnull id)key;
+- (BOOL)removeObjectForKey:(nonnull id)key;
+- (nullable id)objectForKey:(nonnull id)key;
+- (nullable id)objectForKeyedSubscript:(nonnull id)key;
 
 @end
 
