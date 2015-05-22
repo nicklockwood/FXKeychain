@@ -30,7 +30,6 @@
 		0113D967168F011600BAAE7F /* FXKeychainExample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FXKeychainExample-Info.plist"; sourceTree = "<group>"; };
 		0113D969168F011600BAAE7F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0113D96B168F011600BAAE7F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		0113D96D168F011600BAAE7F /* FXKeychainExample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FXKeychainExample-Prefix.pch"; sourceTree = "<group>"; };
 		0113D96E168F011600BAAE7F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		0113D96F168F011600BAAE7F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		0113D971168F011600BAAE7F /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
@@ -40,7 +39,7 @@
 		0113D978168F011600BAAE7F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		0113D97B168F011600BAAE7F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		0113D983168F013F00BAAE7F /* FXKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FXKeychain.h; sourceTree = "<group>"; };
-		0113D984168F013F00BAAE7F /* FXKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FXKeychain.m; sourceTree = "<group>"; };
+		0113D984168F013F00BAAE7F /* FXKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = FXKeychain.m; sourceTree = "<group>"; tabWidth = 4; };
 		0113D98A168F14D000BAAE7F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -67,7 +66,9 @@
 				0113D95E168F011600BAAE7F /* Frameworks */,
 				0113D95C168F011600BAAE7F /* Products */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		0113D95C168F011600BAAE7F /* Products */ = {
 			isa = PBXGroup;
@@ -107,7 +108,6 @@
 				0113D967168F011600BAAE7F /* FXKeychainExample-Info.plist */,
 				0113D968168F011600BAAE7F /* InfoPlist.strings */,
 				0113D96B168F011600BAAE7F /* main.m */,
-				0113D96D168F011600BAAE7F /* FXKeychainExample-Prefix.pch */,
 				0113D971168F011600BAAE7F /* Default.png */,
 				0113D973168F011600BAAE7F /* Default@2x.png */,
 				0113D975168F011600BAAE7F /* Default-568h@2x.png */,
@@ -360,7 +360,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "FXKeychainExample/FXKeychainExample-Prefix.pch";
 				INFOPLIST_FILE = "FXKeychainExample/FXKeychainExample-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -371,7 +370,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "FXKeychainExample/FXKeychainExample-Prefix.pch";
 				INFOPLIST_FILE = "FXKeychainExample/FXKeychainExample-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

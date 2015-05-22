@@ -1,7 +1,7 @@
 //
 //  FXKeychain.m
 //
-//  Version 1.5.2
+//  Version 1.5.3
 //
 //  Created by Nick Lockwood on 29/12/2012.
 //  Copyright 2012 Charcoal Design
@@ -139,7 +139,7 @@
 
 - (NSData *)dataForKey:(id)key
 {
-	//generate query
+    //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
     query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
@@ -165,8 +165,6 @@
 
 - (BOOL)setObject:(id)object forKey:(id)key
 {
-    NSParameterAssert(key);
-
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
     if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
@@ -306,7 +304,7 @@
                                                                 format:&format
                                                                  error:&error];
             
-            if ([object respondsToSelector:@selector(objectForKey:)] && [object objectForKey:@"$archiver"])
+            if ([object respondsToSelector:@selector(objectForKey:)] && [(NSDictionary *)object objectForKey:@"$archiver"])
             {
                 //data represents an NSCoded archive
                 

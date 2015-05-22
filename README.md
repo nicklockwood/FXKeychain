@@ -122,6 +122,10 @@ These values behave the same way as their non-ThisDeviceOnly counterparts, excep
 Release Notes
 ----------------
 
+Version 1.5.3
+
+- Fixed crash when stored value is an array
+
 Version 1.5.2
 
 - Fixed issue on iOS 8 that may have caused crashes and made accessGroup not work correctly
