@@ -306,7 +306,7 @@
                                                                 format:&format
                                                                  error:&error];
             
-            if ([object respondsToSelector:@selector(objectForKey:)] && object[@"$archiver"])
+            if ([object respondsToSelector:@selector(objectForKey:)] && [object objectForKey:@"$archiver"])
             {
                 //data represents an NSCoded archive
                 
