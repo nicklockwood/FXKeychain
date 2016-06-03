@@ -81,6 +81,8 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (nullable id)objectForKey:(nonnull id)key;
 - (nullable id)objectForKeyedSubscript:(nonnull id)key;
 
+- (nullable NSArray <NSString *>*)allKeys;
+
 @end
 
 

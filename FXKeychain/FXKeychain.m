@@ -94,6 +94,15 @@
 
 #endif
 
+static void FXKeychain_collectAllKeys(const void *value, void *context) {
+    CFDictionaryRef dict = value;
+    NSMutableArray *resultArray = (__bridge NSMutableArray *)context;
+    NSString *acct = (__bridge NSString *) CFDictionaryGetValue(dict, kSecAttrAccount);
+    if (acct) {
+        [resultArray addObject:acct];
+    }
+}
+
 
 @implementation FXKeychain
 
@@ -135,6 +144,39 @@
         _accessibility = accessibility;
     }
     return self;
+}
+
+- (NSArray <NSString *>*)allKeys
+{
+    //generate query
+    NSMutableDictionary *query = [NSMutableDictionary dictionary];
+    if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
+    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
+    query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
+    query[(__bridge NSString *)kSecReturnAttributes] = (__bridge id)kCFBooleanTrue;
+    
+#if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+#endif
+    
+    //recover data
+    CFArrayRef data = NULL;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
+    if (status != errSecSuccess && status != errSecItemNotFound)
+    {
+        NSLog(@"FXKeychain failed to enumerate keychain, error: %ld", (long)status);
+    }
+    
+    NSMutableArray *resultArray = [[NSMutableArray alloc] init];
+    if (data)
+    {
+        // do something with the result
+        CFRange range = CFRangeMake(0, CFArrayGetCount(data));
+        CFArrayApplyFunction(data, range, FXKeychain_collectAllKeys, (__bridge void *)resultArray);
+        CFRelease(data);
+    }
+    
+    return resultArray;
 }
 
 - (NSData *)dataForKey:(id)key
