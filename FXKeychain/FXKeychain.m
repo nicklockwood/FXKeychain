@@ -106,17 +106,28 @@ static void FXKeychain_collectAllKeys(const void *value, void *context) {
 
 @implementation FXKeychain
 
-+ (instancetype)defaultKeychain
++ (instancetype)defaultKeychain {
+    return [FXKeychain defaultKeychainForApp:nil appGroup:nil];
+}
+
++ (instancetype)defaultKeychainForApp:(NSString *)app appGroup:(NSString *)group
 {
     static id sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        
-        NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
-        sharedInstance = [[FXKeychain alloc] initWithService:bundleID
-                                                 accessGroup:nil];
+        if ([app length] && [group length])
+        {
+            sharedInstance = [[FXKeychain alloc] initWithService:app
+                                                     accessGroup:group];
+        }
+        else
+        {
+            
+            NSString *bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleIdentifierKey];
+            sharedInstance = [[FXKeychain alloc] initWithService:bundleID accessGroup:nil];
+        }
     });
-
+    
     return sharedInstance;
 }
 
