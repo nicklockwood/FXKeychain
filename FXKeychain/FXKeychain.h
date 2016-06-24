@@ -78,7 +78,7 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (BOOL)setObject:(nullable id)object forKey:(nonnull id)key;
 - (BOOL)setObject:(nullable id)object forKeyedSubscript:(nonnull id)key;
 - (BOOL)removeObjectForKey:(nonnull id)key;
-- (nullable id)objectForKey:(nonnull id)key;
+- (nullable id)objectForKey:(nonnull id)key error:(NSError * _Nullable * _Nullable) error;
 - (nullable id)objectForKeyedSubscript:(nonnull id)key;
 
 @end

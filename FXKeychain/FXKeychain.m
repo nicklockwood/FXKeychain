@@ -286,13 +286,12 @@
     return [self setObject:nil forKey:key];
 }
 
-- (id)objectForKey:(id)key
+- (id)objectForKey:(id)key error:(NSError**) error
 {
     NSData *data = [self dataForKey:key];
     if (data)
     {
         id object = nil;
-        NSError *error = nil;
         NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
         
         //check if data is a binary plist
@@ -302,7 +301,7 @@
             object = [NSPropertyListSerialization propertyListWithData:data
                                                                options:NSPropertyListImmutable
                                                                 format:&format
-                                                                 error:&error];
+                                                                 error:error];
             
             if ([object respondsToSelector:@selector(objectForKey:)] && [(NSDictionary *)object objectForKey:@"$archiver"])
             {
@@ -326,7 +325,7 @@
         }
         if (!object)
         {
-             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
+             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, *error);
         }
         return object;
     }
@@ -339,7 +338,7 @@
 
 - (id)objectForKeyedSubscript:(id)key
 {
-    return [self objectForKey:key];
+    return [self objectForKey:key error:nil];
 }
 
 @end
