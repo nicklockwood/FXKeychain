@@ -163,7 +163,7 @@
 	return CFBridgingRelease(data);
 }
 
-- (BOOL)setObject:(id)object forKey:(id)key
+- (BOOL)setObject:(id)object forKey:(id)key error:(NSError**) error
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -179,7 +179,6 @@
     
     //encode object
     NSData *data = nil;
-    NSError *error = nil;
     if ([(id)object isKindOfClass:[NSString class]])
     {
         //check that string data does not represent a binary plist
@@ -187,7 +186,7 @@
         if (![object hasPrefix:@"bplist"] || ![NSPropertyListSerialization propertyListWithData:[object dataUsingEncoding:NSUTF8StringEncoding]
                                                                                         options:NSPropertyListImmutable
                                                                                          format:&format
-                                                                                          error:NULL])
+                                                                                          error:error])
         {
             //safe to encode as a string
             data = [object dataUsingEncoding:NSUTF8StringEncoding];
@@ -200,7 +199,7 @@
         data = [NSPropertyListSerialization dataWithPropertyList:[object FXKeychain_propertyListRepresentation]
                                                           format:NSPropertyListBinaryFormat_v1_0
                                                          options:0
-                                                           error:&error];
+                                                           error:error];
 #if FXKEYCHAIN_USE_NSCODING
         
         //property list encoding failed. try NSCoding
@@ -214,7 +213,7 @@
     }
 
     //fail if object is invalid
-    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
+    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, *error);
 
     if (data)
     {
@@ -278,12 +277,12 @@
 
 - (BOOL)setObject:(id)object forKeyedSubscript:(id)key
 {
-    return [self setObject:object forKey:key];
+    return [self setObject:object forKey:key error:nil];
 }
 
-- (BOOL)removeObjectForKey:(id)key
+- (BOOL)removeObjectForKey:(id)key error:(NSError **)error
 {
-    return [self setObject:nil forKey:key];
+    return [self setObject:nil forKey:key error:error];
 }
 
 - (id)objectForKey:(id)key error:(NSError**) error
