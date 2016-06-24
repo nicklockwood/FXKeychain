@@ -163,6 +163,11 @@
 	return CFBridgingRelease(data);
 }
 
+- (BOOL)setObject:(id)object forKey:(id)key
+{
+    return [self setObject:object forKey:key error:nil];
+}
+
 - (BOOL)setObject:(id)object forKey:(id)key error:(NSError**) error
 {
     //generate query
@@ -277,12 +282,22 @@
 
 - (BOOL)setObject:(id)object forKeyedSubscript:(id)key
 {
-    return [self setObject:object forKey:key error:nil];
+    return [self setObject:object forKey:key];
+}
+
+- (BOOL)removeObjectForKey:(id)key
+{
+    return [self removeObjectForKey:key error:nil];
 }
 
 - (BOOL)removeObjectForKey:(id)key error:(NSError **)error
 {
     return [self setObject:nil forKey:key error:error];
+}
+
+- (id)objectForKey:(id)key
+{
+    return [self objectForKey:key error:nil];
 }
 
 - (id)objectForKey:(id)key error:(NSError**) error
@@ -337,7 +352,7 @@
 
 - (id)objectForKeyedSubscript:(id)key
 {
-    return [self objectForKey:key error:nil];
+    return [self objectForKey:key];
 }
 
 @end
