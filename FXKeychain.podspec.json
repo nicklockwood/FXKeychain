@@ -14,7 +14,9 @@
   "requires_arc": true,
   "platforms": {
     "ios": "4.3",
-    "osx": "10.6"
+    "osx": "10.6",
+    "watchos": "2.0",
+    "tvos": "9.0"
   },
   "frameworks": "Security"
 }
