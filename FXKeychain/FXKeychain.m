@@ -39,6 +39,7 @@
 #error This class requires automatic reference counting
 #endif
 
+#define allSaveKeysBundleId [@"allSaveKeysID-" stringByAppendingString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]]
 
 @implementation NSObject (FXKeychainPropertyListCoding)
 
@@ -94,6 +95,9 @@
 
 #endif
 
+@interface FXKeychain ()
+@property (nonatomic, strong) NSMutableArray <NSString *>*allSaveKeys;
+@end
 
 @implementation FXKeychain
 
@@ -107,7 +111,7 @@
         sharedInstance = [[FXKeychain alloc] initWithService:bundleID
                                                  accessGroup:nil];
     });
-
+    
     return sharedInstance;
 }
 
@@ -146,7 +150,7 @@
     query[(__bridge NSString *)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
     query[(__bridge NSString *)kSecReturnData] = (__bridge id)kCFBooleanTrue;
     query[(__bridge NSString *)kSecAttrAccount] = [key description];
-
+    
 #if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
     
     if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
@@ -156,11 +160,11 @@
     //recover data
     CFDataRef data = NULL;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&data);
-	if (status != errSecSuccess && status != errSecItemNotFound)
+    if (status != errSecSuccess && status != errSecItemNotFound)
     {
-		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
-	}
-	return CFBridgingRelease(data);
+        NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
+    }
+    return CFBridgingRelease(data);
 }
 
 - (BOOL)setObject:(id)object forKey:(id)key
@@ -212,10 +216,10 @@
 #endif
         
     }
-
+    
     //fail if object is invalid
     NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
-
+    
     if (data)
     {
         //update values
@@ -232,18 +236,18 @@
 #endif
         
         //write data
-		OSStatus status = errSecSuccess;
-		if ([self dataForKey:key])
+        OSStatus status = errSecSuccess;
+        if ([self dataForKey:key])
         {
-			//there's already existing data for this key, update it
-			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
-		}
+            //there's already existing data for this key, update it
+            status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
+        }
         else
         {
-			//no existing data, add a new item
+            //no existing data, add a new item
             [query addEntriesFromDictionary:update];
-			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
-		}
+            status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
+        }
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
@@ -273,6 +277,16 @@
             return NO;
         }
     }
+    if (!object) {
+        return YES;//now, it is removing
+    }
+    if (![self.allSaveKeys containsObject:key] && ![key isEqualToString:allSaveKeysBundleId]) {
+        [self.allSaveKeys addObject:key];
+    }
+    NSArray *diskArray = [self objectForKey:allSaveKeysBundleId];
+    if ( diskArray.count != self.allSaveKeys.count) {
+        [self setObject:self.allSaveKeys forKey:allSaveKeysBundleId];
+    }
     return YES;
 }
 
@@ -283,6 +297,10 @@
 
 - (BOOL)removeObjectForKey:(id)key
 {
+    if (self.allSaveKeys.count>0 && [self.allSaveKeys containsObject:key]) {
+        [self.allSaveKeys removeObject:key];
+        [self setObject:self.allSaveKeys forKey:allSaveKeysBundleId];
+    }
     return [self setObject:nil forKey:key];
 }
 
@@ -308,14 +326,14 @@
             {
                 //data represents an NSCoded archive
                 
-    #if FXKEYCHAIN_USE_NSCODING
+#if FXKEYCHAIN_USE_NSCODING
                 
                 //parse as archive
                 object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    #else
+#else
                 //don't trust it
                 object = nil;
-    #endif
+#endif
                 
             }
         }
@@ -326,7 +344,7 @@
         }
         if (!object)
         {
-             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
+            NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
         }
         return object;
     }
@@ -341,5 +359,31 @@
 {
     return [self objectForKey:key];
 }
+
+- (BOOL)removeAllObjects {
+    if (!self.allSaveKeys.count) return YES;
+    
+    BOOL result = YES;
+    for (NSString *key in self.allSaveKeys) {
+        BOOL success = [self removeObjectForKey:key];
+        if (!success) {
+            result = NO;
+        }
+    }
+    return result;
+}
+
+- (NSArray<NSString *> *)allKeys {
+    return [self objectForKey:allSaveKeysBundleId];
+}
+
+- (NSMutableArray <NSString *>*)allSaveKeys {
+    if (!_allSaveKeys) {
+        _allSaveKeys = [NSMutableArray arrayWithCapacity:1];
+        _allSaveKeys = [NSMutableArray arrayWithArray:[self objectForKey:allSaveKeysBundleId]];
+    }
+    return _allSaveKeys;
+}
+
 
 @end
