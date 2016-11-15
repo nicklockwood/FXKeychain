@@ -37,6 +37,26 @@
     
     //load data
     [self load];
+    
+    [self testRemoveAllFunction];
+}
+
+- (void)testRemoveAllFunction {
+    FXKeychain *keychain = [FXKeychain defaultKeychain];
+    NSLog(@"begin save");
+    [keychain setObject:@"1" forKey:@"test1"];
+    [keychain setObject:@"2" forKey:@"test2"];
+    NSLog(@"should be test1 and test2:%@",[keychain allKeys]);
+   
+    [keychain removeObjectForKey:@"test1"];
+    NSLog(@"should be test2:%@",[keychain allKeys]);
+    
+    [keychain removeAllObjects];
+    NSLog(@"after remove all:%@",[keychain allKeys]);
+    for (NSString *key in [keychain allKeys]) {
+        NSLog(@"value:%@,key:%@",[keychain objectForKey:key],key);
+    }
+    NSLog(@"end");
 }
 
 - (void)saveSettings

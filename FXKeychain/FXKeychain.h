@@ -81,6 +81,8 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (nullable id)objectForKey:(nonnull id)key;
 - (nullable id)objectForKeyedSubscript:(nonnull id)key;
 
+- (BOOL)removeAllObjects;//if you add objects before this version,tihs function can not remover these objects
+- (nullable NSArray <NSString *>*)allKeys;//if you add objects before this version,tihs function can not get these keys
 @end
 
 
