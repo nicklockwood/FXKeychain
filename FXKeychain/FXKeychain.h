@@ -59,6 +59,7 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
     FXKeychainAccessibleAlwaysThisDeviceOnly
 };
 
+extern NSString * _Nonnull const kFXKeychainErrorDomain;
 
 @interface FXKeychain : NSObject
 
