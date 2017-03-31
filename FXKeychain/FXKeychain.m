@@ -39,6 +39,7 @@
 #error This class requires automatic reference counting
 #endif
 
+NSString * const kFXKeychainErrorDomain = @"FXKeychainErrorDomain";
 
 @implementation NSObject (FXKeychainPropertyListCoding)
 
@@ -137,7 +138,7 @@
     return self;
 }
 
-- (NSData *)dataForKey:(id)key
+- (NSData *)dataForKey:(id)key error:(NSError **)error
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -159,6 +160,7 @@
 	if (status != errSecSuccess && status != errSecItemNotFound)
     {
 		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
+        *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
 	}
 	return CFBridgingRelease(data);
 }
@@ -168,7 +170,7 @@
     return [self setObject:object forKey:key error:nil];
 }
 
-- (BOOL)setObject:(id)object forKey:(id)key error:(NSError**) error
+- (BOOL)setObject:(id)object forKey:(id)key error:(NSError **)error
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -237,7 +239,7 @@
         
         //write data
 		OSStatus status = errSecSuccess;
-		if ([self dataForKey:key])
+		if ([self dataForKey:key error:error])
         {
 			//there's already existing data for this key, update it
 			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
@@ -251,6 +253,7 @@
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
+            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
             return NO;
         }
     }
@@ -274,6 +277,7 @@
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
+            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
             return NO;
         }
     }
@@ -300,9 +304,9 @@
     return [self objectForKey:key error:nil];
 }
 
-- (id)objectForKey:(id)key error:(NSError**) error
+- (id)objectForKey:(id)key error:(NSError **) error
 {
-    NSData *data = [self dataForKey:key];
+    NSData *data = [self dataForKey:key error:error];
     if (data)
     {
         id object = nil;
@@ -339,7 +343,7 @@
         }
         if (!object)
         {
-             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, *error);
+            NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, *error);
         }
         return object;
     }
