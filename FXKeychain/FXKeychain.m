@@ -160,7 +160,10 @@ NSString * const kFXKeychainErrorDomain = @"FXKeychainErrorDomain";
 	if (status != errSecSuccess && status != errSecItemNotFound)
     {
 		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
-        *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+        if (error != NULL)
+        {
+            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+        }
 	}
 	return CFBridgingRelease(data);
 }
@@ -253,7 +256,10 @@ NSString * const kFXKeychainErrorDomain = @"FXKeychainErrorDomain";
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
-            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            if (error != NULL)
+            {
+                *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            }
             return NO;
         }
     }
@@ -277,7 +283,10 @@ NSString * const kFXKeychainErrorDomain = @"FXKeychainErrorDomain";
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
-            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            if (error != NULL)
+            {
+                *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            }
             return NO;
         }
     }
