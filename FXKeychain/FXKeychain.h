@@ -75,6 +75,9 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (nonnull id)initWithService:(nullable NSString *)service
                   accessGroup:(nullable NSString *)accessGroup;
 
+- (nullable NSData *)dataForKey:(nonnull id)key;
+- (BOOL)setData:(nullable NSData *)data forKey:(nonnull id)key;
+
 - (BOOL)setObject:(nullable id)object forKey:(nonnull id)key;
 - (BOOL)setObject:(nullable id)object forKeyedSubscript:(nonnull id)key;
 - (BOOL)removeObjectForKey:(nonnull id)key;
