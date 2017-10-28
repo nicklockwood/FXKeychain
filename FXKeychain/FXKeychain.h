@@ -59,6 +59,7 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
     FXKeychainAccessibleAlwaysThisDeviceOnly
 };
 
+extern NSString * _Nonnull const kFXKeychainErrorDomain;
 
 @interface FXKeychain : NSObject
 
@@ -76,9 +77,12 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
                   accessGroup:(nullable NSString *)accessGroup;
 
 - (BOOL)setObject:(nullable id)object forKey:(nonnull id)key;
+- (BOOL)setObject:(nullable id)object forKey:(nonnull id)key error:(NSError * _Nullable * _Nullable) error;
 - (BOOL)setObject:(nullable id)object forKeyedSubscript:(nonnull id)key;
 - (BOOL)removeObjectForKey:(nonnull id)key;
+- (BOOL)removeObjectForKey:(nonnull id)key error:(NSError * _Nullable * _Nullable) error;
 - (nullable id)objectForKey:(nonnull id)key;
+- (nullable id)objectForKey:(nonnull id)key error:(NSError * _Nullable * _Nullable) error;
 - (nullable id)objectForKeyedSubscript:(nonnull id)key;
 
 @end

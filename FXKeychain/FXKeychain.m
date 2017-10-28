@@ -39,6 +39,7 @@
 #error This class requires automatic reference counting
 #endif
 
+NSString * const kFXKeychainErrorDomain = @"FXKeychainErrorDomain";
 
 @implementation NSObject (FXKeychainPropertyListCoding)
 
@@ -137,7 +138,7 @@
     return self;
 }
 
-- (NSData *)dataForKey:(id)key
+- (NSData *)dataForKey:(id)key error:(NSError **)error
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -159,11 +160,20 @@
 	if (status != errSecSuccess && status != errSecItemNotFound)
     {
 		NSLog(@"FXKeychain failed to retrieve data for key '%@', error: %ld", key, (long)status);
+        if (error != NULL)
+        {
+            *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+        }
 	}
 	return CFBridgingRelease(data);
 }
 
 - (BOOL)setObject:(id)object forKey:(id)key
+{
+    return [self setObject:object forKey:key error:nil];
+}
+
+- (BOOL)setObject:(id)object forKey:(id)key error:(NSError **)error
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -179,7 +189,6 @@
     
     //encode object
     NSData *data = nil;
-    NSError *error = nil;
     if ([(id)object isKindOfClass:[NSString class]])
     {
         //check that string data does not represent a binary plist
@@ -187,7 +196,7 @@
         if (![object hasPrefix:@"bplist"] || ![NSPropertyListSerialization propertyListWithData:[object dataUsingEncoding:NSUTF8StringEncoding]
                                                                                         options:NSPropertyListImmutable
                                                                                          format:&format
-                                                                                          error:NULL])
+                                                                                          error:error])
         {
             //safe to encode as a string
             data = [object dataUsingEncoding:NSUTF8StringEncoding];
@@ -200,7 +209,7 @@
         data = [NSPropertyListSerialization dataWithPropertyList:[object FXKeychain_propertyListRepresentation]
                                                           format:NSPropertyListBinaryFormat_v1_0
                                                          options:0
-                                                           error:&error];
+                                                           error:error];
 #if FXKEYCHAIN_USE_NSCODING
         
         //property list encoding failed. try NSCoding
@@ -214,7 +223,7 @@
     }
 
     //fail if object is invalid
-    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
+    NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, *error);
 
     if (data)
     {
@@ -233,7 +242,7 @@
         
         //write data
 		OSStatus status = errSecSuccess;
-		if ([self dataForKey:key])
+		if ([self dataForKey:key error:error])
         {
 			//there's already existing data for this key, update it
 			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
@@ -247,6 +256,10 @@
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
+            if (error != NULL)
+            {
+                *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            }
             return NO;
         }
     }
@@ -270,6 +283,10 @@
         if (status != errSecSuccess)
         {
             NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
+            if (error != NULL)
+            {
+                *error = [NSError errorWithDomain:kFXKeychainErrorDomain code:status userInfo:nil];
+            }
             return NO;
         }
     }
@@ -283,16 +300,25 @@
 
 - (BOOL)removeObjectForKey:(id)key
 {
-    return [self setObject:nil forKey:key];
+    return [self removeObjectForKey:key error:nil];
+}
+
+- (BOOL)removeObjectForKey:(id)key error:(NSError **)error
+{
+    return [self setObject:nil forKey:key error:error];
 }
 
 - (id)objectForKey:(id)key
 {
-    NSData *data = [self dataForKey:key];
+    return [self objectForKey:key error:nil];
+}
+
+- (id)objectForKey:(id)key error:(NSError **) error
+{
+    NSData *data = [self dataForKey:key error:error];
     if (data)
     {
         id object = nil;
-        NSError *error = nil;
         NSPropertyListFormat format = NSPropertyListBinaryFormat_v1_0;
         
         //check if data is a binary plist
@@ -302,7 +328,7 @@
             object = [NSPropertyListSerialization propertyListWithData:data
                                                                options:NSPropertyListImmutable
                                                                 format:&format
-                                                                 error:&error];
+                                                                 error:error];
             
             if ([object respondsToSelector:@selector(objectForKey:)] && [(NSDictionary *)object objectForKey:@"$archiver"])
             {
@@ -326,7 +352,7 @@
         }
         if (!object)
         {
-             NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, error);
+            NSLog(@"FXKeychain failed to decode data for key '%@', error: %@", key, *error);
         }
         return object;
     }
