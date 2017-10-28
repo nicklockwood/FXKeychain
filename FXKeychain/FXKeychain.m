@@ -137,7 +137,7 @@
     return self;
 }
 
-- (NSData *)dataForKey:(id)key
+- (NSData *)dataForKey:(nonnull id)key
 {
     //generate query
     NSMutableDictionary *query = [NSMutableDictionary dictionary];
@@ -163,20 +163,81 @@
 	return CFBridgingRelease(data);
 }
 
-- (BOOL)setObject:(id)object forKey:(id)key
+- (BOOL)setData:(NSData *)data forKey:(id)key
 {
-    //generate query
-    NSMutableDictionary *query = [NSMutableDictionary dictionary];
-    if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
-    query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
-    query[(__bridge NSString *)kSecAttrAccount] = [key description];
-    
+	//generate query
+	NSMutableDictionary *query = [NSMutableDictionary dictionary];
+	if ([self.service length]) query[(__bridge NSString *)kSecAttrService] = self.service;
+	query[(__bridge NSString *)kSecClass] = (__bridge id)kSecClassGenericPassword;
+	query[(__bridge NSString *)kSecAttrAccount] = [key description];
+	
 #if TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
-    
-    if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
-    
+	
+	if ([_accessGroup length]) query[(__bridge NSString *)kSecAttrAccessGroup] = _accessGroup;
+	
 #endif
-    
+	if (data)
+	{
+		//update values
+		NSMutableDictionary *update = [@{(__bridge NSString *)kSecValueData: data} mutableCopy];
+		
+#if TARGET_OS_IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_9
+		
+		update[(__bridge NSString *)kSecAttrAccessible] = @[(__bridge id)kSecAttrAccessibleWhenUnlocked,
+															(__bridge id)kSecAttrAccessibleAfterFirstUnlock,
+															(__bridge id)kSecAttrAccessibleAlways,
+															(__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+															(__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+															(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly][self.accessibility];
+#endif
+		
+		//write data
+		OSStatus status = errSecSuccess;
+		if ([self dataForKey:key])
+		{
+			//there's already existing data for this key, update it
+			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
+		}
+		else
+		{
+			//no existing data, add a new item
+			[query addEntriesFromDictionary:update];
+			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
+		}
+		if (status != errSecSuccess)
+		{
+			NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
+			return NO;
+		}
+	}
+	else if (self[key])
+	{
+		//delete existing data
+		
+#if TARGET_OS_IPHONE
+		
+		OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
+#else
+		CFTypeRef result = NULL;
+		query[(__bridge id)kSecReturnRef] = (__bridge id)kCFBooleanTrue;
+		OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+		if (status == errSecSuccess)
+		{
+			status = SecKeychainItemDelete((SecKeychainItemRef) result);
+			CFRelease(result);
+		}
+#endif
+		if (status != errSecSuccess)
+		{
+			NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
+			return NO;
+		}
+	}
+	return YES;
+}
+
+- (BOOL)setObject:(id)object forKey:(id)key
+{    
     //encode object
     NSData *data = nil;
     NSError *error = nil;
@@ -215,65 +276,8 @@
 
     //fail if object is invalid
     NSAssert(!object || (object && data), @"FXKeychain failed to encode object for key '%@', error: %@", key, error);
-
-    if (data)
-    {
-        //update values
-        NSMutableDictionary *update = [@{(__bridge NSString *)kSecValueData: data} mutableCopy];
-        
-#if TARGET_OS_IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_9
-        
-        update[(__bridge NSString *)kSecAttrAccessible] = @[(__bridge id)kSecAttrAccessibleWhenUnlocked,
-                                                            (__bridge id)kSecAttrAccessibleAfterFirstUnlock,
-                                                            (__bridge id)kSecAttrAccessibleAlways,
-                                                            (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                                                            (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-                                                            (__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly][self.accessibility];
-#endif
-        
-        //write data
-		OSStatus status = errSecSuccess;
-		if ([self dataForKey:key])
-        {
-			//there's already existing data for this key, update it
-			status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)update);
-		}
-        else
-        {
-			//no existing data, add a new item
-            [query addEntriesFromDictionary:update];
-			status = SecItemAdd ((__bridge CFDictionaryRef)query, NULL);
-		}
-        if (status != errSecSuccess)
-        {
-            NSLog(@"FXKeychain failed to store data for key '%@', error: %ld", key, (long)status);
-            return NO;
-        }
-    }
-    else if (self[key])
-    {
-        //delete existing data
-        
-#if TARGET_OS_IPHONE
-        
-        OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
-#else
-        CFTypeRef result = NULL;
-        query[(__bridge id)kSecReturnRef] = (__bridge id)kCFBooleanTrue;
-        OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
-        if (status == errSecSuccess)
-        {
-            status = SecKeychainItemDelete((SecKeychainItemRef) result);
-            CFRelease(result);
-        }
-#endif
-        if (status != errSecSuccess)
-        {
-            NSLog(@"FXKeychain failed to delete data for key '%@', error: %ld", key, (long)status);
-            return NO;
-        }
-    }
-    return YES;
+	
+    return [self setData:data forKey:key];
 }
 
 - (BOOL)setObject:(id)object forKeyedSubscript:(id)key
