@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 @interface FXKeychain : NSObject
 
 + (nonnull instancetype)defaultKeychain;
++ (instancetype)defaultKeychainForApp:(NSString *)app appGroup:(NSString *)group;
 
 @property (nonatomic, readonly, nullable) NSString *service;
 @property (nonatomic, readonly, nullable) NSString *accessGroup;
@@ -80,6 +81,8 @@ typedef NS_ENUM(NSInteger, FXKeychainAccess)
 - (BOOL)removeObjectForKey:(nonnull id)key;
 - (nullable id)objectForKey:(nonnull id)key;
 - (nullable id)objectForKeyedSubscript:(nonnull id)key;
+
+- (nullable NSArray <NSString *>*)allKeys;
 
 @end
 
